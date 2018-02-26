@@ -58,6 +58,8 @@ public class WasteManagementRed : MonoBehaviour {
     private int consonantOccurances = 0;
     private int stage = 1;
 
+    private bool morsemodules = false, trnstrikes = false, frkstrikes = false, sigtime = false, strike = false;
+
     private bool _isSolved = false, _lightsOn = false, generated = false, calculated = false, barempty = false;
 
 	void Start () {
@@ -114,7 +116,7 @@ public class WasteManagementRed : MonoBehaviour {
         Init();
         _lightsOn = true;
     }
-
+        
     void Init()
     {
         if (!generated)
@@ -126,6 +128,7 @@ public class WasteManagementRed : MonoBehaviour {
             screen.text = "Paper";
         }
         //reset
+        if (strike) UndoTime();
         stage = 1;
         paperRecycle = 0;
         plasticRecycle = 0;
@@ -140,6 +143,31 @@ public class WasteManagementRed : MonoBehaviour {
         metalWaste = 0;
         leftoverWaste = 0;
         input = 0;
+        strike = false;
+    }
+
+    void UndoTime()
+    {
+        if (morsemodules)
+        {
+            paperAmount += 26;
+            morsemodules = false;
+        }
+        if (trnstrikes)
+        {
+            plasticAmount -= 91;
+            trnstrikes = false;
+        }
+        if (frkstrikes)
+        {
+            plasticAmount -= 69;
+            frkstrikes = false;
+        }
+        if (sigtime)
+        {
+            metalAmount -= 99;
+            sigtime = false;
+        }
     }
 
     void generateAmounts()
@@ -252,6 +280,7 @@ public class WasteManagementRed : MonoBehaviour {
         {
             if (currentTime <= startTime / 2)
             {
+                morsemodules = true;
                 paperAmount -= 26;
                 Debug.LogFormat("[Waste Management #{0}] Taken 26 from the paper amount (Morse module)", _moduleId);
                 Debug.LogFormat("[Waste Management #{0}] Paper amount is now {1}", _moduleId, paperAmount);
@@ -259,12 +288,14 @@ public class WasteManagementRed : MonoBehaviour {
         }
         if (Info.IsIndicatorPresent(Indicator.TRN) && Info.GetStrikes() != 1)
         {
+            trnstrikes = true;
             plasticAmount += 91;
             Debug.LogFormat("[Waste Management #{0}] Added 91 to the plastic amount (trn indicator)", _moduleId);
             Debug.LogFormat("[Waste Management #{0}] Plastic amount is now {1}", _moduleId, plasticAmount);
         }
         if (Info.IsIndicatorPresent(Indicator.FRK) && Info.GetStrikes() != 2)
         {
+            frkstrikes = true;
             plasticAmount += 69;
             Debug.LogFormat("[Waste Management #{0}] Added 69 to the plastic amount (frk indicator)", _moduleId);
             Debug.LogFormat("[Waste Management #{0}] Plastic amount is now {1}", _moduleId, plasticAmount);
@@ -273,6 +304,7 @@ public class WasteManagementRed : MonoBehaviour {
         {
             if (currentTime <= startTime / 5)
             {
+                sigtime = true;
                 metalAmount += 99;
                 Debug.LogFormat("[Waste Management #{0}] Added 99 to the metal amount (sig indicator)", _moduleId);
                 Debug.LogFormat("[Waste Management #{0}] Metal amount is now {1}", _moduleId, metalAmount);
@@ -386,6 +418,7 @@ public class WasteManagementRed : MonoBehaviour {
         if (barempty) //if the bar is empty
         {
             Module.HandleStrike();
+            strike = true;
             Debug.LogFormat("[Waste Management #{0}] Strike given, reset the module", _moduleId);
             Init();
         } else input += 1;
@@ -399,6 +432,7 @@ public class WasteManagementRed : MonoBehaviour {
         if (barempty)
         {
             Module.HandleStrike();
+            strike = true;
             Debug.LogFormat("[Waste Management #{0}] Strike given, reset the module", _moduleId);
             Init();
         }
@@ -413,6 +447,7 @@ public class WasteManagementRed : MonoBehaviour {
         if (barempty)
         {
             Module.HandleStrike();
+            strike = true;
             Debug.LogFormat("[Waste Management #{0}] Strike given, reset the module", _moduleId);
             Init();
         }
@@ -427,6 +462,7 @@ public class WasteManagementRed : MonoBehaviour {
         if (barempty)
         {
             Module.HandleStrike();
+            strike = true;
             Debug.LogFormat("[Waste Management #{0}] Strike given, reset the module", _moduleId);
             Init();
         }
@@ -441,6 +477,7 @@ public class WasteManagementRed : MonoBehaviour {
         if (barempty)
         {
             Module.HandleStrike();
+            strike = true;
             Debug.LogFormat("[Waste Management #{0}] Strike given, reset the module", _moduleId);
             Init();
         }
@@ -463,6 +500,7 @@ public class WasteManagementRed : MonoBehaviour {
         if (barempty)
         {
             Module.HandleStrike();
+            strike = true;
             Debug.LogFormat("[Waste Management #{0}] Strike given, reset the module", _moduleId);
             Init();
         }
@@ -485,6 +523,7 @@ public class WasteManagementRed : MonoBehaviour {
         if (barempty)
         {
             Module.HandleStrike();
+            strike = true;
             Debug.LogFormat("[Waste Management #{0}] Strike given, reset the module", _moduleId);
             Init();
         }
@@ -552,6 +591,7 @@ public class WasteManagementRed : MonoBehaviour {
             {
                 Debug.LogFormat("[Waste Management #{0}] Paper incorrect, Strike.", _moduleId);
                 Module.HandleStrike();
+                strike = true;
                 Init();
             }
         } else if (stage == 2)
@@ -570,6 +610,7 @@ public class WasteManagementRed : MonoBehaviour {
             {
                 Debug.LogFormat("[Waste Management #{0}] Plastic incorrect, Strike.", _moduleId);
                 Module.HandleStrike();
+                strike = true;
                 Init();
             }
         } else if (stage == 3)
@@ -601,6 +642,7 @@ public class WasteManagementRed : MonoBehaviour {
             else
             {
                 Debug.LogFormat("[Waste Management #{0}] Metal incorrect, Strike.", _moduleId);
+                strike = true;
                 Module.HandleStrike();
                 Init();
             }
@@ -622,6 +664,7 @@ public class WasteManagementRed : MonoBehaviour {
             else
             {
                 Debug.LogFormat("[Waste Management #{0}] Leftovers incorrect, Strike.", _moduleId);
+                strike = true;
                 Module.HandleStrike();
                 Init();
             }
