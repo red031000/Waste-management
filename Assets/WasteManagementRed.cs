@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using System;
 
 public class WasteManagementRed : MonoBehaviour {
-
+    #region GlobalVariables
     public KMBombInfo Info;
     public KMAudio Audio;
     public KMBombModule Module;
@@ -62,7 +62,9 @@ public class WasteManagementRed : MonoBehaviour {
 
     private bool _isSolved = false, _lightsOn = false, generated = false, calculated = false, barempty = false;
 
-	void Start () {
+    #endregion
+
+    void Start () {
         _moduleId = _moduleIdCounter++;
         Module.OnActivate += Activate;
 	}
@@ -198,7 +200,7 @@ public class WasteManagementRed : MonoBehaviour {
             Debug.LogFormat("[Waste Management #{0}] Added 154 to the paper amount (zero batteries)", _moduleId);
             Debug.LogFormat("[Waste Management #{0}] Paper amount is now {1}", _moduleId, paperAmount);
         }
-        if (Info.GetSerialNumberLetters().Any("SAVEMYWORLD".Contains) && consonantOccurances <= 2)
+        if (Info.GetSerialNumberLetters().Any("SAVEMYWORLD".Contains) && !(consonantOccurances > 2)) //oops
         {
             paperAmount += 200;
             Debug.LogFormat("[Waste Management #{0}] Added 200 to the paper amount (Save My World)", _moduleId);
@@ -380,7 +382,7 @@ public class WasteManagementRed : MonoBehaviour {
                 Debug.LogFormat("[Waste Management #{0}] Plastic answer is recycle half", _moduleId);
             } else if (plasticRemaining < 100 && plasticRemaining > 10)
             {
-                plasticWaste = plasticRemaining;
+                plasticWasteAns = plasticRemaining;
                 Debug.LogFormat("[Waste Management #{0}] Plastic answer is waste all", _moduleId);
             }
             if (paperRemaining < 65)
@@ -409,7 +411,7 @@ public class WasteManagementRed : MonoBehaviour {
             }
         }
     }
-
+    #region ButtonHandling
     private void btnIHandler()
     {
         Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, btnI.transform);
@@ -680,10 +682,11 @@ public class WasteManagementRed : MonoBehaviour {
             }
         }
     }
-
+    #endregion
+    #region TwitchPlays
     //twitch plays commands
     public string TwitchHelpMessage = "Allocate the number 66 to waste with !{0} LXVIW. Change the W to an R for recycling. Reset the module with !{0} Reset. Submit the answer with !{0} Submit.";
-    public string TwitchManualCode;
+    public string TwitchManualCode = "https://ktane.timwi.de/HTML/Waste%20Management.html";
     public KMSelectable[] ProcessTwitchCommand(string command)
     {
         command = command.ToLowerInvariant().Trim();
@@ -739,4 +742,5 @@ public class WasteManagementRed : MonoBehaviour {
         else
             return null;
     }
+    #endregion
 }
