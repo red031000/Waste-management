@@ -383,6 +383,7 @@ public class WasteManagementRed : MonoBehaviour {
             } else if (plasticRemaining < 100 && plasticRemaining > 10)
             {
                 plasticWasteAns = plasticRemaining;
+                plasticRemaining = 0;
                 Debug.LogFormat("[Waste Management #{0}] Plastic answer is waste all", _moduleId);
             }
             if (paperRemaining < 65)
