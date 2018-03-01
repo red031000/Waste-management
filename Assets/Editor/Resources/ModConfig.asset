@@ -26,6 +26,6 @@ MonoBehaviour:
 
 
     Programming and TP support by red031000'
-  version: 1.4
+  version: 1.5
   outputFolder: build
   previewImage: {fileID: 2800000, guid: 969fe6759afa61a408c594f07c90b337, type: 3}

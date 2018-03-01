@@ -304,7 +304,7 @@ public class WasteManagementRed : MonoBehaviour {
         }
         if (Info.IsIndicatorPresent(Indicator.SIG))
         {
-            if (currentTime <= startTime / 5)
+            if (currentTime > startTime / 5)
             {
                 sigtime = true;
                 metalAmount += 99;
