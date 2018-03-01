@@ -125,7 +125,7 @@ public class WasteManagementRed : MonoBehaviour {
         {
             startTime = Mathf.FloorToInt(Info.GetTime());
             modulesName = Info.GetModuleNames();
-            consonantOccurances = Info.GetSerialNumber().Count("ABCDFGHJKLMNPQRSTVWXYZ".Contains);
+            consonantOccurances = Info.GetSerialNumber().Count("BCDFGHJKLMNPQRSTVWXYZ".Contains); //double oops
             generateAmounts(); //generate the initial amounts of paper, plastic and metal
             screen.text = "Paper";
         }
@@ -194,7 +194,7 @@ public class WasteManagementRed : MonoBehaviour {
             Debug.LogFormat("[Waste Management #{0}] Paper amount is now {1}", _moduleId, paperAmount);
         }
         //don't calculate time dependent rules yet, as we don't know when the submit button is going to be pressed
-        if (Info.GetBatteryCount() == 0 && Info.GetIndicators().Count() > 3)
+        if (Info.GetBatteryCount() == 0 && Info.GetIndicators().Count() < 3) //again, oops
         {
             paperAmount += 154;
             Debug.LogFormat("[Waste Management #{0}] Added 154 to the paper amount (zero batteries)", _moduleId);
