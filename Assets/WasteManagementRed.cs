@@ -257,22 +257,13 @@ public class WasteManagementRed : MonoBehaviour {
             Debug.LogFormat("[Waste Management #{0}] Subtracted 84 from metal amount (Forget Me Not)", _moduleId);
             Debug.LogFormat("[Waste Management #{0}] Metal amount is now {1}", _moduleId, metalAmount);
         }
-        //print final amounts and cleanup
-        if (paperAmount < -1)
-        {
-            paperAmount *= -1;
-        }
-        if (plasticAmount < -1)
-        {
-            plasticAmount *= -1;
-        }
-        if (metalAmount < -1)
-        {
-            metalAmount *= -1;
-        }
-        Debug.LogFormat("[Waste Management #{0}] Final paper amount before time and strike based rules is {1}", _moduleId, paperAmount);
-        Debug.LogFormat("[Waste Management #{0}] Final plastic amount before time and strike based rules is {1}", _moduleId, plasticAmount);
-        Debug.LogFormat("[Waste Management #{0}] Final metal amount before time and strike based rules is {1}", _moduleId, metalAmount);
+        //print final amounts. Perform the actual cleanup at submit time
+        int tempPaper = paperAmount * -1;
+        int tempPlastic = plasticAmount * -1;
+        int tempMetal = metalAmount * -1;
+        Debug.LogFormat("[Waste Management #{0}] Final paper amount before time and strike based rules is {1}", _moduleId, tempPaper);
+        Debug.LogFormat("[Waste Management #{0}] Final plastic amount before time and strike based rules is {1}", _moduleId, tempPlastic);
+        Debug.LogFormat("[Waste Management #{0}] Final metal amount before time and strike based rules is {1}", _moduleId, tempMetal);
         generated = true;
     }
 
@@ -395,8 +386,8 @@ public class WasteManagementRed : MonoBehaviour {
                     Debug.LogFormat("[Waste Management #{0}] Paper answer is recycle all", _moduleId);
                 } else
                 {
-                    paperWasteAns = (int)(paperRemaining * (1/3));
-                    paperRemaining = (int)(paperRemaining * (2/3));
+                    paperWasteAns = (int)(paperRemaining / 3.0f);
+                    paperRemaining = (int)(2 * paperRemaining / 3.0f); //weird thing happening with floats here
                     Debug.LogFormat("[Waste Management #{0}] Paper answer is waste one third", _moduleId);
                 }
             }
