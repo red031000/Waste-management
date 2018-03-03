@@ -178,13 +178,13 @@ public class WasteManagementRed : MonoBehaviour {
         if (Info.IsIndicatorPresent(Indicator.IND) && KMBombInfoExtensions.GetBatteryCount(Info) < 5)
         {
             paperAmount += 19;
-            Debug.LogFormat("[Waste Management #{0}] Added 19 to the paper amount (ind indicator)", _moduleId);
+            Debug.LogFormat("[Waste Management #{0}] Added 19 to the paper amount (IND indicator)", _moduleId);
             Debug.LogFormat("[Waste Management #{0}] Paper amount is now {1}", _moduleId, paperAmount);
         }
         if (Info.IsIndicatorPresent(Indicator.SND))
         {
             paperAmount += 15;
-            Debug.LogFormat("[Waste Management #{0}] Added 15 to the paper amount (snd indicator)", _moduleId);
+            Debug.LogFormat("[Waste Management #{0}] Added 15 to the paper amount (SND indicator)", _moduleId);
             Debug.LogFormat("[Waste Management #{0}] Paper amount is now {1}", _moduleId, paperAmount);
         }
         if (Info.IsPortPresent(Port.Parallel))
@@ -217,26 +217,26 @@ public class WasteManagementRed : MonoBehaviour {
         if (Info.IsIndicatorPresent(Indicator.FRQ) && !(Info.GetBatteryCount(Battery.D) > Info.GetBatteryCount(Battery.AA)))
         {
             plasticAmount += 153;
-            Debug.LogFormat("[Waste Management #{0}] Added 153 to the plastic amount (frq indicator)", _moduleId);
+            Debug.LogFormat("[Waste Management #{0}] Added 153 to the plastic amount (FRQ indicator)", _moduleId);
             Debug.LogFormat("[Waste Management #{0}] Plastic amount is now {1}", _moduleId, plasticAmount);
         }
         //metal
         if (Info.IsIndicatorPresent(Indicator.BOB))
         {
             metalAmount += 199;
-            Debug.LogFormat("[Waste Management #{0}] Added 199 to the metal amount (bob indicator)", _moduleId);
+            Debug.LogFormat("[Waste Management #{0}] Added 199 to the metal amount (BOB indicator)", _moduleId);
             Debug.LogFormat("[Waste Management #{0}] Metal amount is now {1}", _moduleId, metalAmount);
         }
         if (Info.IsIndicatorPresent(Indicator.MSA))
         {
             metalAmount += 92;
-            Debug.LogFormat("[Waste Management #{0}] Added 92 to the metal amount (msa indicator)", _moduleId);
+            Debug.LogFormat("[Waste Management #{0}] Added 92 to the metal amount (MSA indicator)", _moduleId);
             Debug.LogFormat("[Waste Management #{0}] Metal amount is now {1}", _moduleId, metalAmount);
         }
         if (Info.IsIndicatorPresent(Indicator.CAR) && !(Info.IsPortPresent(Port.RJ45)))
         {
             metalAmount -= 200;
-            Debug.LogFormat("[Waste Management #{0}] Subtracted 200 from the metal amount (car indicator)", _moduleId);
+            Debug.LogFormat("[Waste Management #{0}] Subtracted 200 from the metal amount (CAR indicator)", _moduleId);
             Debug.LogFormat("[Waste Management #{0}] Metal amount is now {1}", _moduleId, metalAmount);
         }
         if (KMBombInfoExtensions.IsDuplicatePortPresent(Info) && !(Info.IsPortPresent(Port.DVI)))
@@ -249,7 +249,7 @@ public class WasteManagementRed : MonoBehaviour {
         if (Info.IsIndicatorOn(Indicator.BOB) && Info.GetPortCount() >= 6)
         {
             metalAmount += 99;
-            Debug.LogFormat("[Waste Management #{0}] Added 99 to the metal amount (lit bob and at least 6 ports)", _moduleId);
+            Debug.LogFormat("[Waste Management #{0}] Added 99 to the metal amount (lit BOB and at least 6 ports)", _moduleId);
             Debug.LogFormat("[Waste Management #{0}] Metal amount is now {1}", _moduleId, metalAmount);
         } else if (modulesName.Contains("Forget Me Not"))
         {
@@ -280,14 +280,14 @@ public class WasteManagementRed : MonoBehaviour {
         {
             trnstrikes = true;
             plasticAmount += 91;
-            Debug.LogFormat("[Waste Management #{0}] Added 91 to the plastic amount (trn indicator)", _moduleId);
+            Debug.LogFormat("[Waste Management #{0}] Added 91 to the plastic amount (TRN indicator)", _moduleId);
             Debug.LogFormat("[Waste Management #{0}] Plastic amount is now {1}", _moduleId, plasticAmount);
         }
         if (Info.IsIndicatorPresent(Indicator.FRK) && Info.GetStrikes() != 2)
         {
             frkstrikes = true;
             plasticAmount += 69;
-            Debug.LogFormat("[Waste Management #{0}] Added 69 to the plastic amount (frk indicator)", _moduleId);
+            Debug.LogFormat("[Waste Management #{0}] Added 69 to the plastic amount (FRK indicator)", _moduleId);
             Debug.LogFormat("[Waste Management #{0}] Plastic amount is now {1}", _moduleId, plasticAmount);
         }
         if (Info.IsIndicatorPresent(Indicator.SIG))
@@ -296,7 +296,7 @@ public class WasteManagementRed : MonoBehaviour {
             {
                 sigtime = true;
                 metalAmount += 99;
-                Debug.LogFormat("[Waste Management #{0}] Added 99 to the metal amount (sig indicator)", _moduleId);
+                Debug.LogFormat("[Waste Management #{0}] Added 99 to the metal amount (SIG indicator)", _moduleId);
                 Debug.LogFormat("[Waste Management #{0}] Metal amount is now {1}", _moduleId, metalAmount);
             }
         }
@@ -557,8 +557,8 @@ public class WasteManagementRed : MonoBehaviour {
         if (stage == 1)
         {
             calculateProportions();
-            Debug.LogFormat("[Waste Management #{0}] Recieved {1} for paper recycling, expected {2}", _moduleId, paperRecycle, paperRecycleAns);
-            Debug.LogFormat("[Waste Management #{0}] Recieved {1} for paper waste, expected {2}", _moduleId, paperWaste, paperWasteAns);
+            Debug.LogFormat("[Waste Management #{0}] Received {1} for paper recycling, expected {2}", _moduleId, paperRecycle, paperRecycleAns);
+            Debug.LogFormat("[Waste Management #{0}] Received {1} for paper waste, expected {2}", _moduleId, paperWaste, paperWasteAns);
             if (paperRecycle == paperRecycleAns && paperWaste == paperWasteAns)
             {
                 Debug.LogFormat("[Waste Management #{0}] Paper correct!", _moduleId);
@@ -575,8 +575,8 @@ public class WasteManagementRed : MonoBehaviour {
             }
         } else if (stage == 2)
         {
-            Debug.LogFormat("[Waste Management #{0}] Recieved {1} for plastic recycling, expected {2}", _moduleId, plasticRecycle, plasticRecycleAns);
-            Debug.LogFormat("[Waste Management #{0}] Recieved {1} for plastic waste, expected {2}", _moduleId, plasticWaste, plasticWasteAns);
+            Debug.LogFormat("[Waste Management #{0}] Received {1} for plastic recycling, expected {2}", _moduleId, plasticRecycle, plasticRecycleAns);
+            Debug.LogFormat("[Waste Management #{0}] Received {1} for plastic waste, expected {2}", _moduleId, plasticWaste, plasticWasteAns);
             if (plasticRecycle == plasticRecycleAns && plasticWaste == plasticWasteAns)
             {
                 Debug.LogFormat("[Waste Management #{0}] Plastic correct!", _moduleId);
@@ -594,8 +594,8 @@ public class WasteManagementRed : MonoBehaviour {
             }
         } else if (stage == 3)
         {
-            Debug.LogFormat("[Waste Management #{0}] Recieved {1} for metal recycling, expected {2}", _moduleId, metalRecycle, metalRecycleAns);
-            Debug.LogFormat("[Waste Management #{0}] Recieved {1} for metal waste, expected {2}", _moduleId, metalWaste, metalWasteAns);
+            Debug.LogFormat("[Waste Management #{0}] Received {1} for metal recycling, expected {2}", _moduleId, metalRecycle, metalRecycleAns);
+            Debug.LogFormat("[Waste Management #{0}] Received {1} for metal waste, expected {2}", _moduleId, metalWaste, metalWasteAns);
             if (metalRecycle == metalRecycleAns && metalWaste == metalWasteAns)
             {
                 if (leftoverRecycleAns > 0 || leftoverWasteAns > 0)
@@ -627,8 +627,8 @@ public class WasteManagementRed : MonoBehaviour {
             }
         } else
         {
-            Debug.LogFormat("[Waste Management #{0}] Recieved {1} for leftover recycling, expected {2}", _moduleId, leftoverRecycle, leftoverRecycleAns);
-            Debug.LogFormat("[Waste Management #{0}] Recieved {1} for leftover waste, expected {2}", _moduleId, leftoverWaste, leftoverWasteAns);
+            Debug.LogFormat("[Waste Management #{0}] Received {1} for leftover recycling, expected {2}", _moduleId, leftoverRecycle, leftoverRecycleAns);
+            Debug.LogFormat("[Waste Management #{0}] Received {1} for leftover waste, expected {2}", _moduleId, leftoverWaste, leftoverWasteAns);
             if (leftoverRecycle == leftoverRecycleAns && leftoverWaste == leftoverWasteAns)
             {
                 Debug.LogFormat("[Waste Management #{0}] Leftovers correct!", _moduleId);
@@ -662,8 +662,8 @@ public class WasteManagementRed : MonoBehaviour {
     #endregion
     #region TwitchPlays
     //twitch plays commands
-    public string TwitchHelpMessage = "Allocate the number 66 to waste with !{0} LXVIW. Change the W to an R for recycling. Reset the module with !{0} Reset. Submit the answer with !{0} Submit.";
-    public string TwitchManualCode = "https://ktane.timwi.de/HTML/Waste%20Management.html";
+    private string TwitchHelpMessage = "Allocate the number 66 to waste with !{0} LXVIW. Change the W to an R for recycling. Reset the module with !{0} Reset. Submit the answer with !{0} Submit.";
+    private string TwitchManualCode = "Waste Management";
     public KMSelectable[] ProcessTwitchCommand(string command)
     {
         command = command.ToLowerInvariant().Trim();
