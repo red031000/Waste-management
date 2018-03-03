@@ -207,14 +207,14 @@ public class WasteManagementRed : MonoBehaviour {
             Debug.LogFormat("[Waste Management #{0}] Paper amount is now {1}", _moduleId, paperAmount);
         }
         //plastic
-        //miss all the check to do with strikes because we don't know how many strikes we have untill we submit
+        //miss all the check to do with strikes because we don't know how many strikes we have until we submit
         if (Info.GetPortPlates().Any(x => x.Length == 0) && modulesName.Count % 2 == 0)
         {
             plasticAmount -= 17;
             Debug.LogFormat("[Waste Management #{0}] Subtracted 17 from the plastic amount (Empty port plate)", _moduleId);
             Debug.LogFormat("[Waste Management #{0}] Plastic amount is now {1}", _moduleId, plasticAmount);
         }
-        if (Info.IsIndicatorPresent(Indicator.FRQ) && Info.GetBatteryCount(Battery.D) < Info.GetBatteryCount(Battery.AA))
+        if (Info.IsIndicatorPresent(Indicator.FRQ) && !(Info.GetBatteryCount(Battery.D) > Info.GetBatteryCount(Battery.AA)))
         {
             plasticAmount += 153;
             Debug.LogFormat("[Waste Management #{0}] Added 153 to the plastic amount (frq indicator)", _moduleId);
@@ -257,13 +257,10 @@ public class WasteManagementRed : MonoBehaviour {
             Debug.LogFormat("[Waste Management #{0}] Subtracted 84 from metal amount (Forget Me Not)", _moduleId);
             Debug.LogFormat("[Waste Management #{0}] Metal amount is now {1}", _moduleId, metalAmount);
         }
-        //print final amounts. Perform the actual cleanup at submit time
-        int tempPaper = paperAmount * -1;
-        int tempPlastic = plasticAmount * -1;
-        int tempMetal = metalAmount * -1;
-        Debug.LogFormat("[Waste Management #{0}] Final paper amount before time and strike based rules is {1}", _moduleId, tempPaper);
-        Debug.LogFormat("[Waste Management #{0}] Final plastic amount before time and strike based rules is {1}", _moduleId, tempPlastic);
-        Debug.LogFormat("[Waste Management #{0}] Final metal amount before time and strike based rules is {1}", _moduleId, tempMetal);
+        //print temporary amounts. Perform the actual cleanup at submit time
+        Debug.LogFormat("[Waste Management #{0}] The signed paper amount before time and strike based rules is {1}", _moduleId, paperAmount);
+        Debug.LogFormat("[Waste Management #{0}] The signed plastic amount before time and strike based rules is {1}", _moduleId, plasticAmount);
+        Debug.LogFormat("[Waste Management #{0}] The signed metal amount before time and strike based rules is {1}", _moduleId, metalAmount);
         generated = true;
     }
 
@@ -304,21 +301,13 @@ public class WasteManagementRed : MonoBehaviour {
             }
         }
         //cleanup again and print final after time and strike adjustments
-        if (paperAmount < -1)
-        {
-            paperAmount *= -1;
-        }
-        if (plasticAmount < -1)
-        {
-            plasticAmount *= -1;
-        }
-        if (metalAmount < -1)
-        {
-            metalAmount *= -1;
-        }
-        Debug.LogFormat("[Waste Management #{0}] Final paper amount after time and strike based rules is {1}", _moduleId, paperAmount);
-        Debug.LogFormat("[Waste Management #{0}] Final plastic amount after time and strike based rules is {1}", _moduleId, plasticAmount);
-        Debug.LogFormat("[Waste Management #{0}] Final metal amount after time and strike based rules is {1}", _moduleId, metalAmount);
+        paperRemaining =  Mathf.Abs(paperAmount);
+        plasticRemaining =  Mathf.Abs(plasticAmount);
+        metalRemaining = Mathf.Abs(metalAmount);
+        leftoverRemaining = 0;
+        Debug.LogFormat("[Waste Management #{0}] Final non-negative paper amount after time and strike based rules is {1}", _moduleId, paperRemaining);
+        Debug.LogFormat("[Waste Management #{0}] Final non-negative plastic amount after time and strike based rules is {1}", _moduleId, plasticRemaining);
+        Debug.LogFormat("[Waste Management #{0}] Final non-negative metal amount after time and strike based rules is {1}", _moduleId, metalRemaining);
         calculated = true;
     }
 
@@ -344,7 +333,7 @@ public class WasteManagementRed : MonoBehaviour {
         else if (metalRemaining > 200)
         {
             metalRecycleAns = (int)(metalRemaining * 0.75f);
-            metalWasteAns = (int)(metalRemaining * 0.25f);
+            metalWasteAns = (int)(metalRemaining - metalRecycleAns);
             metalRemaining = 0;
             Debug.LogFormat("[Waste Management #{0}] Metal answer is recycle three quarters, waste one quarter", _moduleId);
             continueto4 = true;
@@ -354,7 +343,7 @@ public class WasteManagementRed : MonoBehaviour {
             paperRecycleAns = paperRemaining;
             paperRemaining = 0;
             metalWasteAns = (int)(metalRemaining * 0.25f);
-            metalRemaining = (int)(metalRemaining * 0.75f);
+            metalRemaining = (int)(metalRemaining - metalWasteAns);
             leftoverRemaining = metalRemaining + plasticRemaining;
             leftoverRecycleAns = (int)(leftoverRemaining * 0.5f);
             Debug.LogFormat("[Waste Management #{0}] Paper answer is recycle everything", _moduleId);
@@ -368,7 +357,7 @@ public class WasteManagementRed : MonoBehaviour {
             if (plasticRemaining < 300 && plasticRemaining > 100)
             {
                 plasticRecycleAns = (int)(plasticRemaining * 0.5f);
-                plasticRemaining = (int)(plasticRemaining * 0.5f);
+                plasticRemaining = (int)(plasticRemaining - plasticRecycleAns);
                 is4true = true;
                 Debug.LogFormat("[Waste Management #{0}] Plastic answer is recycle half", _moduleId);
             } else if (plasticRemaining < 100 && plasticRemaining > 10)
@@ -387,7 +376,7 @@ public class WasteManagementRed : MonoBehaviour {
                 } else
                 {
                     paperWasteAns = (int)(paperRemaining / 3.0f);
-                    paperRemaining = (int)(2 * paperRemaining / 3.0f); //weird thing happening with floats here
+                    paperRemaining = (int)(paperRemaining - paperWasteAns); //weird thing happening with floats here
                     Debug.LogFormat("[Waste Management #{0}] Paper answer is waste one third", _moduleId);
                 }
             }
@@ -567,10 +556,6 @@ public class WasteManagementRed : MonoBehaviour {
         }
         if (stage == 1)
         {
-            metalRemaining = metalAmount;
-            plasticRemaining = plasticAmount;
-            paperRemaining = paperAmount;
-            leftoverRemaining = 0;
             calculateProportions();
             Debug.LogFormat("[Waste Management #{0}] Recieved {1} for paper recycling, expected {2}", _moduleId, paperRecycle, paperRecycleAns);
             Debug.LogFormat("[Waste Management #{0}] Recieved {1} for paper waste, expected {2}", _moduleId, paperWaste, paperWasteAns);
