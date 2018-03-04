@@ -662,8 +662,10 @@ public class WasteManagementRed : MonoBehaviour {
     #endregion
     #region TwitchPlays
     //twitch plays commands
+#pragma warning disable 414
     private string TwitchHelpMessage = "Allocate the number 66 to waste with !{0} LXVIW. Change the W to an R for recycling. Reset the module with !{0} Reset. Submit the answer with !{0} Submit.";
     private string TwitchManualCode = "Waste Management";
+#pragma warning restore 414
     public KMSelectable[] ProcessTwitchCommand(string command)
     {
         command = command.ToLowerInvariant().Trim();
