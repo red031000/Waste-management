@@ -333,7 +333,7 @@ public class WasteManagementRed : MonoBehaviour {
         else if (metalRemaining > 200)
         {
             metalRecycleAns = (int)(metalRemaining * 0.75f);
-            metalWasteAns = (int)(metalRemaining - metalRecycleAns);
+            metalWasteAns = (int)(metalRemaining * 0.25f);
             metalRemaining = 0;
             Debug.LogFormat("[Waste Management #{0}] Metal answer is recycle three quarters, waste one quarter", _moduleId);
             continueto4 = true;
@@ -343,7 +343,7 @@ public class WasteManagementRed : MonoBehaviour {
             paperRecycleAns = paperRemaining;
             paperRemaining = 0;
             metalWasteAns = (int)(metalRemaining * 0.25f);
-            metalRemaining = (int)(metalRemaining - metalWasteAns);
+            metalRemaining = (int)(metalRemaining * 0.75f);
             leftoverRemaining = metalRemaining + plasticRemaining;
             leftoverRecycleAns = (int)(leftoverRemaining * 0.5f);
             Debug.LogFormat("[Waste Management #{0}] Paper answer is recycle everything", _moduleId);
@@ -357,7 +357,7 @@ public class WasteManagementRed : MonoBehaviour {
             if (plasticRemaining < 300 && plasticRemaining > 100)
             {
                 plasticRecycleAns = (int)(plasticRemaining * 0.5f);
-                plasticRemaining = (int)(plasticRemaining - plasticRecycleAns);
+                plasticRemaining = (int)(plasticRemaining * 0.5f);
                 is4true = true;
                 Debug.LogFormat("[Waste Management #{0}] Plastic answer is recycle half", _moduleId);
             } else if (plasticRemaining < 100 && plasticRemaining > 10)
@@ -376,7 +376,7 @@ public class WasteManagementRed : MonoBehaviour {
                 } else
                 {
                     paperWasteAns = (int)(paperRemaining / 3.0f);
-                    paperRemaining = (int)(paperRemaining - paperWasteAns); //weird thing happening with floats here
+                    paperRemaining = (int)(2 * paperRemaining / 3.0f); //weird thing happening with floats here
                     Debug.LogFormat("[Waste Management #{0}] Paper answer is waste one third", _moduleId);
                 }
             }
