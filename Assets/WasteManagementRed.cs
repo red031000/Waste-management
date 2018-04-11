@@ -6,109 +6,110 @@ using System.Text.RegularExpressions;
 using System;
 
 public class WasteManagementRed : MonoBehaviour {
-    #region GlobalVariables
+    #region Global Variables
     public KMBombInfo Info;
     public KMAudio Audio;
     public KMBombModule Module;
 
-    public KMSelectable btnI, btnV, btnX, btnL, Waste, Recycle, submit, reset;
-    public TextMesh screen;
-    public GameObject barControl;
-    public MeshRenderer bar;
+    public KMSelectable BtnI, BtnV, BtnX, BtnL, Waste, Recycle, Submit, Reset;
+    public TextMesh Screen;
+    public GameObject BarControl;
+    public MeshRenderer Bar;
 
     private static int _moduleIdCounter = 1;
     private int _moduleId = 0;
 
-    private int startTime;
-    private int currentTime;
+    private int StartTime;
+    private int CurrentTime;
 
-    private List<string> modulesName;
+    private List<string> ModulesName;
 
-    private int input = 0;
+    private int Input = 0;
 
-    private int paperAmount = 0;
-    private int plasticAmount = 0;
-    private int metalAmount = 0;
+    private int PaperAmount = 0;
+    private int PlasticAmount = 0;
+    private int MetalAmount = 0;
 
-    private int paperRemaining = 0;
-    private int plasticRemaining = 0;
-    private int metalRemaining = 0;
-    private int leftoverRemaining = 0;
+    private int PaperRemaining = 0;
+    private int PlasticRemaining = 0;
+    private int MetalRemaining = 0;
+    private int LeftoverRemaining = 0;
 
-    private int paperRecycle = 0;
-    private int paperRecycleAns = 0;
-    private int paperWaste = 0;
-    private int paperWasteAns = 0;
+    private int PaperRecycle = 0;
+    private int PaperRecycleAns = 0;
+    private int PaperWaste = 0;
+    private int PaperWasteAns = 0;
 
-    private int plasticRecycle = 0;
-    private int plasticRecycleAns = 0;
-    private int plasticWaste = 0;
-    private int plasticWasteAns = 0;
+    private int PlasticRecycle = 0;
+    private int PlasticRecycleAns = 0;
+    private int PlasticWaste = 0;
+    private int PlasticWasteAns = 0;
 
-    private int metalRecycle = 0;
-    private int metalRecycleAns = 0;
-    private int metalWaste = 0;
-    private int metalWasteAns = 0;
+    private int MetalRecycle = 0;
+    private int MetalRecycleAns = 0;
+    private int MetalWaste = 0;
+    private int MetalWasteAns = 0;
 
-    private int leftoverRecycle = 0;
-    private int leftoverRecycleAns = 0;
-    private int leftoverWaste = 0;
-    private int leftoverWasteAns = 0;
+    private int LeftoverRecycle = 0;
+    private int LeftoverRecycleAns = 0;
+    private int LeftoverWaste = 0;
+    private int LeftoverWasteAns = 0;
 
-    private int consonantOccurances = 0;
-    private int stage = 1;
+    private int ConsonantOccurances = 0;
+    private int Stage = 1;
 
-    private bool morsemodules = false, trnstrikes = false, frkstrikes = false, sigtime = false, strike = false;
+    private bool Morsemodules = false, Trnstrikes = false, Frkstrikes = false, Sigtime = false, Strike = false;
 
-    private bool _isSolved = false, _lightsOn = false, generated = false, calculated = false, barempty = false;
+    private bool _isSolved = false, _lightsOn = false, Generated = false, Calculated = false, Barempty = false;
 
-    #endregion
+	#endregion
 
-    void Start () {
+	#region Answer Calculation
+	void Start () {
         _moduleId = _moduleIdCounter++;
         Module.OnActivate += Activate;
 	}
 
     private void Awake() //button handlers
     {
-        reset.OnInteract += delegate ()
+        Reset.OnInteract += delegate ()
         {
-            resetHandler();
+            ResetHandler();
             return false;
         };
-        submit.OnInteract += delegate ()
+        Submit.OnInteract += delegate ()
         {
-            submitHandler();
+            SubmitHandler();
             return false;
         };
         Waste.OnInteract += delegate ()
         {
-            wasteHandler();
+            WasteHandler();
             return false;
         };
         Recycle.OnInteract += delegate ()
         {
-            recycleHandler();
+            RecycleHandler();
             return false;
         };
-        btnI.OnInteract += delegate ()
+        BtnI.OnInteract += delegate ()
         {
-            btnIHandler();
+            BtnIHandler();
             return false;
         };
-        btnV.OnInteract += delegate ()
+        BtnV.OnInteract += delegate ()
         {
-            btnVHandler();
+            BtnVHandler();
             return false;
         };
-        btnX.OnInteract += delegate ()
+        BtnX.OnInteract += delegate ()
         {
-            btnXHandler();
+            BtnXHandler();
             return false;
         };
-        btnL.OnInteract += delegate ()
+        BtnL.OnInteract += delegate ()
         {
-            btnLHandler();
+            BtnLHandler();
             return false;
         };
     }
@@ -121,490 +122,492 @@ public class WasteManagementRed : MonoBehaviour {
         
     void Init()
     {
-        if (!generated)
+        if (!Generated)
         {
-            startTime = Mathf.FloorToInt(Info.GetTime());
-            modulesName = Info.GetModuleNames();
-            consonantOccurances = Info.GetSerialNumber().Count("BCDFGHJKLMNPQRSTVWXYZ".Contains); //double oops
-            generateAmounts(); //generate the initial amounts of paper, plastic and metal
-            screen.text = "Paper";
+            StartTime = Mathf.FloorToInt(Info.GetTime());
+            ModulesName = Info.GetModuleNames();
+            ConsonantOccurances = Info.GetSerialNumber().Count("BCDFGHJKLMNPQRSTVWXYZ".Contains);
+            GenerateAmounts(); //generate the initial amounts of paper, plastic and metal
+            Screen.text = "Paper";
         }
         //reset
-        if (strike) UndoTime();
-        stage = 1;
-        paperRecycle = 0;
-        plasticRecycle = 0;
-        metalRecycle = 0;
-        leftoverRecycle = 0;
-        screen.text = "Paper";
-        screen.fontSize = 75;
-        calculated = false;
+        if (Strike) UndoTime();
+        Stage = 1;
+        PaperRecycle = 0;
+        PlasticRecycle = 0;
+        MetalRecycle = 0;
+        LeftoverRecycle = 0;
+        Screen.text = "Paper";
+        Screen.fontSize = 75;
+        Calculated = false;
 
-        paperWaste = 0;
-        plasticWaste = 0;
-        metalWaste = 0;
-        leftoverWaste = 0;
-        input = 0;
-        strike = false;
+        PaperWaste = 0;
+        PlasticWaste = 0;
+        MetalWaste = 0;
+        LeftoverWaste = 0;
+        Input = 0;
+        Strike = false;
     }
 
     void UndoTime()
     {
-        if (morsemodules)
+        if (Morsemodules)
         {
-            paperAmount += 26;
-            morsemodules = false;
+            PaperAmount += 26;
+            Morsemodules = false;
         }
-        if (trnstrikes)
+        if (Trnstrikes)
         {
-            plasticAmount -= 91;
-            trnstrikes = false;
+            PlasticAmount -= 91;
+            Trnstrikes = false;
         }
-        if (frkstrikes)
+        if (Frkstrikes)
         {
-            plasticAmount -= 69;
-            frkstrikes = false;
+            PlasticAmount -= 69;
+            Frkstrikes = false;
         }
-        if (sigtime)
+        if (Sigtime)
         {
-            metalAmount -= 99;
-            sigtime = false;
+            MetalAmount -= 99;
+            Sigtime = false;
         }
     }
 
-    void generateAmounts()
+    void GenerateAmounts()
     {
         //paper
         if (Info.IsIndicatorPresent(Indicator.IND) && KMBombInfoExtensions.GetBatteryCount(Info) < 5)
         {
-            paperAmount += 19;
+            PaperAmount += 19;
             Debug.LogFormat("[Waste Management #{0}] Added 19 to the paper amount (IND indicator)", _moduleId);
-            Debug.LogFormat("[Waste Management #{0}] Paper amount is now {1}", _moduleId, paperAmount);
+            Debug.LogFormat("[Waste Management #{0}] Paper amount is now {1}", _moduleId, PaperAmount);
         }
         if (Info.IsIndicatorPresent(Indicator.SND))
         {
-            paperAmount += 15;
+            PaperAmount += 15;
             Debug.LogFormat("[Waste Management #{0}] Added 15 to the paper amount (SND indicator)", _moduleId);
-            Debug.LogFormat("[Waste Management #{0}] Paper amount is now {1}", _moduleId, paperAmount);
+            Debug.LogFormat("[Waste Management #{0}] Paper amount is now {1}", _moduleId, PaperAmount);
         }
         if (Info.IsPortPresent(Port.Parallel))
         {
-            paperAmount -= 44;
+            PaperAmount -= 44;
             Debug.LogFormat("[Waste Management #{0}] Subtracted 44 from the paper amount (parallel port)", _moduleId);
-            Debug.LogFormat("[Waste Management #{0}] Paper amount is now {1}", _moduleId, paperAmount);
+            Debug.LogFormat("[Waste Management #{0}] Paper amount is now {1}", _moduleId, PaperAmount);
         }
         //don't calculate time dependent rules yet, as we don't know when the submit button is going to be pressed
         if (Info.GetBatteryCount() == 0 && Info.GetIndicators().Count() < 3) //again, oops
         {
-            paperAmount += 154;
+            PaperAmount += 154;
             Debug.LogFormat("[Waste Management #{0}] Added 154 to the paper amount (zero batteries)", _moduleId);
-            Debug.LogFormat("[Waste Management #{0}] Paper amount is now {1}", _moduleId, paperAmount);
+            Debug.LogFormat("[Waste Management #{0}] Paper amount is now {1}", _moduleId, PaperAmount);
         }
-        if (Info.GetSerialNumberLetters().Any("SAVEMYWORLD".Contains) && !(consonantOccurances > 2)) //oops
+        if (Info.GetSerialNumberLetters().Any("SAVEMYWORLD".Contains) && !(ConsonantOccurances > 2))
         {
-            paperAmount += 200;
+            PaperAmount += 200;
             Debug.LogFormat("[Waste Management #{0}] Added 200 to the paper amount (Save My World)", _moduleId);
-            Debug.LogFormat("[Waste Management #{0}] Paper amount is now {1}", _moduleId, paperAmount);
+            Debug.LogFormat("[Waste Management #{0}] Paper amount is now {1}", _moduleId, PaperAmount);
         }
         //plastic
         //miss all the check to do with strikes because we don't know how many strikes we have until we submit
-        if (Info.GetPortPlates().Any(x => x.Length == 0) && modulesName.Count % 2 == 0)
+        if (Info.GetPortPlates().Any(x => x.Length == 0) && ModulesName.Count % 2 == 0)
         {
-            plasticAmount -= 17;
+            PlasticAmount -= 17;
             Debug.LogFormat("[Waste Management #{0}] Subtracted 17 from the plastic amount (Empty port plate)", _moduleId);
-            Debug.LogFormat("[Waste Management #{0}] Plastic amount is now {1}", _moduleId, plasticAmount);
+            Debug.LogFormat("[Waste Management #{0}] Plastic amount is now {1}", _moduleId, PlasticAmount);
         }
         if (Info.IsIndicatorPresent(Indicator.FRQ) && !(Info.GetBatteryCount(Battery.D) > Info.GetBatteryCount(Battery.AA)))
         {
-            plasticAmount += 153;
+            PlasticAmount += 153;
             Debug.LogFormat("[Waste Management #{0}] Added 153 to the plastic amount (FRQ indicator)", _moduleId);
-            Debug.LogFormat("[Waste Management #{0}] Plastic amount is now {1}", _moduleId, plasticAmount);
+            Debug.LogFormat("[Waste Management #{0}] Plastic amount is now {1}", _moduleId, PlasticAmount);
         }
         //metal
         if (Info.IsIndicatorPresent(Indicator.BOB))
         {
-            metalAmount += 199;
+            MetalAmount += 199;
             Debug.LogFormat("[Waste Management #{0}] Added 199 to the metal amount (BOB indicator)", _moduleId);
-            Debug.LogFormat("[Waste Management #{0}] Metal amount is now {1}", _moduleId, metalAmount);
+            Debug.LogFormat("[Waste Management #{0}] Metal amount is now {1}", _moduleId, MetalAmount);
         }
         if (Info.IsIndicatorPresent(Indicator.MSA))
         {
-            metalAmount += 92;
+            MetalAmount += 92;
             Debug.LogFormat("[Waste Management #{0}] Added 92 to the metal amount (MSA indicator)", _moduleId);
-            Debug.LogFormat("[Waste Management #{0}] Metal amount is now {1}", _moduleId, metalAmount);
+            Debug.LogFormat("[Waste Management #{0}] Metal amount is now {1}", _moduleId, MetalAmount);
         }
         if (Info.IsIndicatorPresent(Indicator.CAR) && !(Info.IsPortPresent(Port.RJ45)))
         {
-            metalAmount -= 200;
+            MetalAmount -= 200;
             Debug.LogFormat("[Waste Management #{0}] Subtracted 200 from the metal amount (CAR indicator)", _moduleId);
-            Debug.LogFormat("[Waste Management #{0}] Metal amount is now {1}", _moduleId, metalAmount);
+            Debug.LogFormat("[Waste Management #{0}] Metal amount is now {1}", _moduleId, MetalAmount);
         }
         if (KMBombInfoExtensions.IsDuplicatePortPresent(Info) && !(Info.IsPortPresent(Port.DVI)))
         {
-            metalAmount += 153;
+            MetalAmount += 153;
             Debug.LogFormat("[Waste Management #{0}] Added 153 to the metal amount (duplicate port)", _moduleId);
-            Debug.LogFormat("[Waste Management #{0}] Metal amount is now {1}", _moduleId, metalAmount);
+            Debug.LogFormat("[Waste Management #{0}] Metal amount is now {1}", _moduleId, MetalAmount);
         }
         //again, time stuff needs to be done a point of submission
         if (Info.IsIndicatorOn(Indicator.BOB) && Info.GetPortCount() >= 6)
         {
-            metalAmount += 99;
+            MetalAmount += 99;
             Debug.LogFormat("[Waste Management #{0}] Added 99 to the metal amount (lit BOB and at least 6 ports)", _moduleId);
-            Debug.LogFormat("[Waste Management #{0}] Metal amount is now {1}", _moduleId, metalAmount);
-        } else if (modulesName.Contains("Forget Me Not"))
+            Debug.LogFormat("[Waste Management #{0}] Metal amount is now {1}", _moduleId, MetalAmount);
+        } else if (ModulesName.Contains("Forget Me Not"))
         {
-            metalAmount -= 84;
+            MetalAmount -= 84;
             Debug.LogFormat("[Waste Management #{0}] Subtracted 84 from metal amount (Forget Me Not)", _moduleId);
-            Debug.LogFormat("[Waste Management #{0}] Metal amount is now {1}", _moduleId, metalAmount);
+            Debug.LogFormat("[Waste Management #{0}] Metal amount is now {1}", _moduleId, MetalAmount);
         }
         //print temporary amounts. Perform the actual cleanup at submit time
-        Debug.LogFormat("[Waste Management #{0}] The signed paper amount before time and strike based rules is {1}", _moduleId, paperAmount);
-        Debug.LogFormat("[Waste Management #{0}] The signed plastic amount before time and strike based rules is {1}", _moduleId, plasticAmount);
-        Debug.LogFormat("[Waste Management #{0}] The signed metal amount before time and strike based rules is {1}", _moduleId, metalAmount);
-        generated = true;
+        Debug.LogFormat("[Waste Management #{0}] The signed paper amount before time and strike based rules is {1}", _moduleId, PaperAmount);
+        Debug.LogFormat("[Waste Management #{0}] The signed plastic amount before time and strike based rules is {1}", _moduleId, PlasticAmount);
+        Debug.LogFormat("[Waste Management #{0}] The signed metal amount before time and strike based rules is {1}", _moduleId, MetalAmount);
+        Generated = true;
     }
 
-    private void timeAdjustments()
+    private void TimeAdjustments()
     {
-        if (modulesName.Contains("Morse Code") || modulesName.Contains("Morse-A-Maze") || modulesName.Contains("Morsematics") || modulesName.Contains("Color Morse"))
+        if (ModulesName.Contains("Morse Code") || ModulesName.Contains("Morse-A-Maze") || ModulesName.Contains("Morsematics") || ModulesName.Contains("Color Morse"))
         {
-            if (currentTime <= startTime / 2)
+            if (CurrentTime <= StartTime / 2)
             {
-                morsemodules = true;
-                paperAmount -= 26;
+                Morsemodules = true;
+                PaperAmount -= 26;
                 Debug.LogFormat("[Waste Management #{0}] Taken 26 from the paper amount (Morse module)", _moduleId);
-                Debug.LogFormat("[Waste Management #{0}] Paper amount is now {1}", _moduleId, paperAmount);
+                Debug.LogFormat("[Waste Management #{0}] Paper amount is now {1}", _moduleId, PaperAmount);
             }
         }
         if (Info.IsIndicatorPresent(Indicator.TRN) && Info.GetStrikes() != 1)
         {
-            trnstrikes = true;
-            plasticAmount += 91;
+            Trnstrikes = true;
+            PlasticAmount += 91;
             Debug.LogFormat("[Waste Management #{0}] Added 91 to the plastic amount (TRN indicator)", _moduleId);
-            Debug.LogFormat("[Waste Management #{0}] Plastic amount is now {1}", _moduleId, plasticAmount);
+            Debug.LogFormat("[Waste Management #{0}] Plastic amount is now {1}", _moduleId, PlasticAmount);
         }
         if (Info.IsIndicatorPresent(Indicator.FRK) && Info.GetStrikes() != 2)
         {
-            frkstrikes = true;
-            plasticAmount += 69;
+            Frkstrikes = true;
+            PlasticAmount += 69;
             Debug.LogFormat("[Waste Management #{0}] Added 69 to the plastic amount (FRK indicator)", _moduleId);
-            Debug.LogFormat("[Waste Management #{0}] Plastic amount is now {1}", _moduleId, plasticAmount);
+            Debug.LogFormat("[Waste Management #{0}] Plastic amount is now {1}", _moduleId, PlasticAmount);
         }
         if (Info.IsIndicatorPresent(Indicator.SIG))
         {
-            if (currentTime > startTime / 5)
+            if (CurrentTime > StartTime / 5)
             {
-                sigtime = true;
-                metalAmount += 99;
+                Sigtime = true;
+                MetalAmount += 99;
                 Debug.LogFormat("[Waste Management #{0}] Added 99 to the metal amount (SIG indicator)", _moduleId);
-                Debug.LogFormat("[Waste Management #{0}] Metal amount is now {1}", _moduleId, metalAmount);
+                Debug.LogFormat("[Waste Management #{0}] Metal amount is now {1}", _moduleId, MetalAmount);
             }
         }
         //cleanup again and print final after time and strike adjustments
-        paperRemaining =  Mathf.Abs(paperAmount);
-        plasticRemaining =  Mathf.Abs(plasticAmount);
-        metalRemaining = Mathf.Abs(metalAmount);
-        leftoverRemaining = 0;
-        Debug.LogFormat("[Waste Management #{0}] Final non-negative paper amount after time and strike based rules is {1}", _moduleId, paperRemaining);
-        Debug.LogFormat("[Waste Management #{0}] Final non-negative plastic amount after time and strike based rules is {1}", _moduleId, plasticRemaining);
-        Debug.LogFormat("[Waste Management #{0}] Final non-negative metal amount after time and strike based rules is {1}", _moduleId, metalRemaining);
-        calculated = true;
+        PaperRemaining =  Mathf.Abs(PaperAmount);
+        PlasticRemaining =  Mathf.Abs(PlasticAmount);
+        MetalRemaining = Mathf.Abs(MetalAmount);
+        LeftoverRemaining = 0;
+        Debug.LogFormat("[Waste Management #{0}] Final non-negative paper amount after time and strike based rules is {1}", _moduleId, PaperRemaining);
+        Debug.LogFormat("[Waste Management #{0}] Final non-negative plastic amount after time and strike based rules is {1}", _moduleId, PlasticRemaining);
+        Debug.LogFormat("[Waste Management #{0}] Final non-negative metal amount after time and strike based rules is {1}", _moduleId, MetalRemaining);
+        Calculated = true;
     }
 
-    private void calculateProportions()
+    private void CalculateProportions()
     {
-        bool continueto4 = false;
-        bool is4true = false;
-        if (paperRemaining + plasticRemaining + metalRemaining > 695)
+        bool Continueto4 = false;
+        bool Is4true = false;
+        if (PaperRemaining + PlasticRemaining + MetalRemaining > 695)
         {
-            paperRecycleAns = paperRemaining;
-            plasticRecycleAns = plasticRemaining;
-            metalRecycleAns = metalRemaining;
-            paperWasteAns = 0;
-            plasticWasteAns = 0;
-            metalWasteAns = 0;
-            paperRemaining = 0;
-            plasticRemaining = 0;
-            metalRemaining = 0;
+            PaperRecycleAns = PaperRemaining;
+            PlasticRecycleAns = PlasticRemaining;
+            MetalRecycleAns = MetalRemaining;
+            PaperWasteAns = 0;
+            PlasticWasteAns = 0;
+            MetalWasteAns = 0;
+            PaperRemaining = 0;
+            PlasticRemaining = 0;
+            MetalRemaining = 0;
             Debug.LogFormat("[Waste Management #{0}] Metal answer is recycle all", _moduleId);
             Debug.LogFormat("[Waste Management #{0}] Plastic answer is recycle all", _moduleId);
             Debug.LogFormat("[Waste Management #{0}] Paper answer is recycle all", _moduleId);
         }
-        else if (metalRemaining > 200)
+        else if (MetalRemaining > 200)
         {
-            metalRecycleAns = (int)(metalRemaining * 0.75f);
-            metalWasteAns = (int)(metalRemaining * 0.25f);
-            metalRemaining = 0;
+            MetalRecycleAns = (int)(MetalRemaining * 0.75f);
+            MetalWasteAns = (int)(MetalRemaining * 0.25f);
+            MetalRemaining = 0;
             Debug.LogFormat("[Waste Management #{0}] Metal answer is recycle three quarters, waste one quarter", _moduleId);
-            continueto4 = true;
+            Continueto4 = true;
         }
-        else if (metalRemaining < paperRemaining)
+        else if (MetalRemaining < PaperRemaining)
         {
-            paperRecycleAns = paperRemaining;
-            paperRemaining = 0;
-            metalWasteAns = (int)(metalRemaining * 0.25f);
-            metalRemaining = (int)(metalRemaining * 0.75f);
-            leftoverRemaining = metalRemaining + plasticRemaining;
-            leftoverRecycleAns = (int)(leftoverRemaining * 0.5f);
+            PaperRecycleAns = PaperRemaining;
+            PaperRemaining = 0;
+            MetalWasteAns = (int)(MetalRemaining * 0.25f);
+            MetalRemaining = (int)(MetalRemaining * 0.75f);
+            LeftoverRemaining = MetalRemaining + PlasticRemaining;
+            LeftoverRecycleAns = (int)(LeftoverRemaining * 0.5f);
             Debug.LogFormat("[Waste Management #{0}] Paper answer is recycle everything", _moduleId);
             Debug.LogFormat("[Waste Management #{0}] Plastic answer is all to leftovers", _moduleId);
             Debug.LogFormat("[Waste Management #{0}] Metal answer is waste one quarter, the rest to leftovers", _moduleId);
             Debug.LogFormat("[Waste Management #{0}] Leftovers answer is recycle half", _moduleId);
         }
-        else continueto4 = true;
-        if (continueto4)
+        else Continueto4 = true;
+        if (Continueto4)
         {
-            if (plasticRemaining < 300 && plasticRemaining > 100)
+            if (PlasticRemaining < 300 && PlasticRemaining > 100)
             {
-                plasticRecycleAns = (int)(plasticRemaining * 0.5f);
-                plasticRemaining = (int)(plasticRemaining * 0.5f);
-                is4true = true;
+                PlasticRecycleAns = (int)(PlasticRemaining * 0.5f);
+                PlasticRemaining = (int)(PlasticRemaining * 0.5f);
+                Is4true = true;
                 Debug.LogFormat("[Waste Management #{0}] Plastic answer is recycle half", _moduleId);
-            } else if (plasticRemaining < 100 && plasticRemaining > 10)
+            } else if (PlasticRemaining < 100 && PlasticRemaining > 10)
             {
-                plasticWasteAns = plasticRemaining;
-                plasticRemaining = 0;
+                PlasticWasteAns = PlasticRemaining;
+                PlasticRemaining = 0;
                 Debug.LogFormat("[Waste Management #{0}] Plastic answer is waste all", _moduleId);
             }
-            if (paperRemaining < 65)
+            if (PaperRemaining < 65)
             {
-                if (is4true)
+                if (Is4true)
                 {
-                    paperRecycleAns = paperRemaining;
-                    paperRemaining = 0;
+                    PaperRecycleAns = PaperRemaining;
+                    PaperRemaining = 0;
                     Debug.LogFormat("[Waste Management #{0}] Paper answer is recycle all", _moduleId);
                 } else
                 {
-                    paperWasteAns = (int)(paperRemaining / 3.0f);
-                    paperRemaining = (int)(2 * paperRemaining / 3.0f); //weird thing happening with floats here
+                    PaperWasteAns = (int)(PaperRemaining / 3.0f);
+                    PaperRemaining = (int)(2 * PaperRemaining / 3.0f);
                     Debug.LogFormat("[Waste Management #{0}] Paper answer is waste one third", _moduleId);
                 }
             }
-            leftoverRemaining = paperRemaining + plasticRemaining + metalRemaining;
-            if (leftoverRemaining < 300 && leftoverRemaining > 100)
+            LeftoverRemaining = PaperRemaining + PlasticRemaining + MetalRemaining;
+            if (LeftoverRemaining < 300 && LeftoverRemaining > 100)
             {
-                leftoverRecycleAns = leftoverRemaining;
+                LeftoverRecycleAns = LeftoverRemaining;
                 Debug.LogFormat("[Waste Management #{0}] Leftover answer is recycle all", _moduleId);
             } else
             {
-                leftoverWasteAns = leftoverRemaining;
+                LeftoverWasteAns = LeftoverRemaining;
                 Debug.LogFormat("[Waste Management #{0}] Leftover answer is waste all", _moduleId);
             }
         }
     }
-    #region ButtonHandling
-    private void btnIHandler()
+	#endregion
+
+	#region Button Handling
+	private void BtnIHandler()
     {
-        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, btnI.transform);
-        btnI.AddInteractionPunch();
+        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, BtnI.transform);
+        BtnI.AddInteractionPunch();
         if (!_lightsOn || _isSolved) return;
-        if (barempty) //if the bar is empty
+        if (Barempty) //if the bar is empty
         {
             Module.HandleStrike();
-            strike = true;
+            Strike = true;
             Debug.LogFormat("[Waste Management #{0}] Strike given, reset the module", _moduleId);
             Init();
-        } else input += 1;
+        } else Input += 1;
     }
 
-    private void btnVHandler()
+    private void BtnVHandler()
     {
-        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, btnV.transform);
-        btnV.AddInteractionPunch();
+        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, BtnV.transform);
+        BtnV.AddInteractionPunch();
         if (!_lightsOn || _isSolved) return;
-        if (barempty)
+        if (Barempty)
         {
             Module.HandleStrike();
-            strike = true;
-            Debug.LogFormat("[Waste Management #{0}] Strike given, reset the module", _moduleId);
-            Init();
-        }
-        else input += 5;
-    }
-
-    private void btnXHandler()
-    {
-        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, btnX.transform);
-        btnX.AddInteractionPunch();
-        if (!_lightsOn || _isSolved) return;
-        if (barempty)
-        {
-            Module.HandleStrike();
-            strike = true;
+            Strike = true;
             Debug.LogFormat("[Waste Management #{0}] Strike given, reset the module", _moduleId);
             Init();
         }
-        else input += 10;
+        else Input += 5;
     }
 
-    private void btnLHandler()
+    private void BtnXHandler()
     {
-        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, btnL.transform);
-        btnL.AddInteractionPunch();
+        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, BtnX.transform);
+        BtnX.AddInteractionPunch();
         if (!_lightsOn || _isSolved) return;
-        if (barempty)
+        if (Barempty)
         {
             Module.HandleStrike();
-            strike = true;
+            Strike = true;
             Debug.LogFormat("[Waste Management #{0}] Strike given, reset the module", _moduleId);
             Init();
         }
-        else input += 50;
+        else Input += 10;
     }
 
-    private void recycleHandler()
+    private void BtnLHandler()
+    {
+        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, BtnL.transform);
+        BtnL.AddInteractionPunch();
+        if (!_lightsOn || _isSolved) return;
+        if (Barempty)
+        {
+            Module.HandleStrike();
+            Strike = true;
+            Debug.LogFormat("[Waste Management #{0}] Strike given, reset the module", _moduleId);
+            Init();
+        }
+        else Input += 50;
+    }
+
+    private void RecycleHandler()
     {
         Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, Recycle.transform);
         Recycle.AddInteractionPunch();
         if (!_lightsOn || _isSolved) return;
-        if (barempty)
+        if (Barempty)
         {
             Module.HandleStrike();
-            strike = true;
+            Strike = true;
             Debug.LogFormat("[Waste Management #{0}] Strike given, reset the module", _moduleId);
             Init();
         }
-        if (stage == 1)
-            paperRecycle = input;
-        else if (stage == 2)
-            plasticRecycle = input;
-        else if (stage == 3)
-            metalRecycle = input;
+        if (Stage == 1)
+            PaperRecycle = Input;
+        else if (Stage == 2)
+            PlasticRecycle = Input;
+        else if (Stage == 3)
+            MetalRecycle = Input;
         else
-            leftoverRecycle = input;
-        input = 0;
+            LeftoverRecycle = Input;
+        Input = 0;
     }
 
-    private void wasteHandler()
+    private void WasteHandler()
     {
         Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, Waste.transform);
         Waste.AddInteractionPunch();
         if (!_lightsOn || _isSolved) return;
-        if (barempty)
+        if (Barempty)
         {
             Module.HandleStrike();
-            strike = true;
+            Strike = true;
             Debug.LogFormat("[Waste Management #{0}] Strike given, reset the module", _moduleId);
             Init();
         }
-        if (stage == 1)
-            paperWaste = input;
-        else if (stage == 2)
-            plasticWaste = input;
-        else if (stage == 3)
-            metalWaste = input;
+        if (Stage == 1)
+            PaperWaste = Input;
+        else if (Stage == 2)
+            PlasticWaste = Input;
+        else if (Stage == 3)
+            MetalWaste = Input;
         else
-            leftoverWaste = input;
-        input = 0;
+            LeftoverWaste = Input;
+        Input = 0;
     }
 
-    private void resetHandler()
+    private void ResetHandler()
     {
-        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, reset.transform);
-        reset.AddInteractionPunch();
+        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, Reset.transform);
+        Reset.AddInteractionPunch();
         if (!_lightsOn || _isSolved) return;
-        if (barempty)
+        if (Barempty)
         {
             Module.HandleStrike();
-            strike = true;
+            Strike = true;
             Debug.LogFormat("[Waste Management #{0}] Strike given, reset the module", _moduleId);
             Init();
         }
-        if (stage == 1)
+        if (Stage == 1)
         {
-            input = 0;
-            paperWaste = 0;
-            paperRecycle = 0;
-        } else if (stage == 2)
+            Input = 0;
+            PaperWaste = 0;
+            PaperRecycle = 0;
+        } else if (Stage == 2)
         {
-            input = 0;
-            plasticWaste = 0;
-            plasticRecycle = 0;
-        } else if (stage == 3)
+            Input = 0;
+            PlasticWaste = 0;
+            PlasticRecycle = 0;
+        } else if (Stage == 3)
         {
-            input = 0;
-            metalWaste = 0;
-            metalRecycle = 0;
+            Input = 0;
+            MetalWaste = 0;
+            MetalRecycle = 0;
         } else
         {
-            input = 0;
-            leftoverWaste = 0;
-            leftoverRecycle = 0;
+            Input = 0;
+            LeftoverWaste = 0;
+            LeftoverRecycle = 0;
         }
     }
 
-    private void submitHandler()
+    private void SubmitHandler()
     {
-        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, submit.transform);
-        submit.AddInteractionPunch();
-        if (barempty)
+        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, Submit.transform);
+        Submit.AddInteractionPunch();
+        if (Barempty)
         {
-            barempty = false;
-            barControl.gameObject.transform.localScale = new Vector3(1, 1, 1);
+            Barempty = false;
+            BarControl.gameObject.transform.localScale = new Vector3(1, 1, 1);
             Debug.LogFormat("[Waste Management #{0}] Strike avoided, continue with next stage", _moduleId);
             return;
         }
 
         if (!_lightsOn || _isSolved) return;
 
-        if (!calculated)
+        if (!Calculated)
         {
             //once submit button is pressed for the first time, those rules will be in effect for the rest of the bomb, unless you get a strike on this module
-            currentTime = Mathf.FloorToInt(Info.GetTime());
+            CurrentTime = Mathf.FloorToInt(Info.GetTime());
             Debug.LogFormat("[Waste Management #{0}] Submit button pressed, performing final adjustments", _moduleId);
-            timeAdjustments();
+            TimeAdjustments();
         }
-        if (stage == 1)
+        if (Stage == 1)
         {
-            calculateProportions();
-            Debug.LogFormat("[Waste Management #{0}] Received {1} for paper recycling, expected {2}", _moduleId, paperRecycle, paperRecycleAns);
-            Debug.LogFormat("[Waste Management #{0}] Received {1} for paper waste, expected {2}", _moduleId, paperWaste, paperWasteAns);
-            if (paperRecycle == paperRecycleAns && paperWaste == paperWasteAns)
+            CalculateProportions();
+            Debug.LogFormat("[Waste Management #{0}] Received {1} for paper recycling, expected {2}", _moduleId, PaperRecycle, PaperRecycleAns);
+            Debug.LogFormat("[Waste Management #{0}] Received {1} for paper waste, expected {2}", _moduleId, PaperWaste, PaperWasteAns);
+            if (PaperRecycle == PaperRecycleAns && PaperWaste == PaperWasteAns)
             {
                 Debug.LogFormat("[Waste Management #{0}] Paper correct!", _moduleId);
-                stage++;
-                input = 0;
-                screen.text = "Plastic";
-                screen.fontSize = 70;
+                Stage++;
+                Input = 0;
+                Screen.text = "Plastic";
+                Screen.fontSize = 70;
             } else
             {
                 Debug.LogFormat("[Waste Management #{0}] Paper incorrect, Strike.", _moduleId);
                 Module.HandleStrike();
-                strike = true;
+                Strike = true;
                 Init();
             }
-        } else if (stage == 2)
+        } else if (Stage == 2)
         {
-            Debug.LogFormat("[Waste Management #{0}] Received {1} for plastic recycling, expected {2}", _moduleId, plasticRecycle, plasticRecycleAns);
-            Debug.LogFormat("[Waste Management #{0}] Received {1} for plastic waste, expected {2}", _moduleId, plasticWaste, plasticWasteAns);
-            if (plasticRecycle == plasticRecycleAns && plasticWaste == plasticWasteAns)
+            Debug.LogFormat("[Waste Management #{0}] Received {1} for plastic recycling, expected {2}", _moduleId, PlasticRecycle, PlasticRecycleAns);
+            Debug.LogFormat("[Waste Management #{0}] Received {1} for plastic waste, expected {2}", _moduleId, PlasticWaste, PlasticWasteAns);
+            if (PlasticRecycle == PlasticRecycleAns && PlasticWaste == PlasticWasteAns)
             {
                 Debug.LogFormat("[Waste Management #{0}] Plastic correct!", _moduleId);
-                stage++;
-                input = 0;
-                screen.text = "Metal";
-                screen.fontSize = 75;
+                Stage++;
+                Input = 0;
+                Screen.text = "Metal";
+                Screen.fontSize = 75;
             }
             else
             {
                 Debug.LogFormat("[Waste Management #{0}] Plastic incorrect, Strike.", _moduleId);
                 Module.HandleStrike();
-                strike = true;
+                Strike = true;
                 Init();
             }
-        } else if (stage == 3)
+        } else if (Stage == 3)
         {
-            Debug.LogFormat("[Waste Management #{0}] Received {1} for metal recycling, expected {2}", _moduleId, metalRecycle, metalRecycleAns);
-            Debug.LogFormat("[Waste Management #{0}] Received {1} for metal waste, expected {2}", _moduleId, metalWaste, metalWasteAns);
-            if (metalRecycle == metalRecycleAns && metalWaste == metalWasteAns)
+            Debug.LogFormat("[Waste Management #{0}] Received {1} for metal recycling, expected {2}", _moduleId, MetalRecycle, MetalRecycleAns);
+            Debug.LogFormat("[Waste Management #{0}] Received {1} for metal waste, expected {2}", _moduleId, MetalWaste, MetalWasteAns);
+            if (MetalRecycle == MetalRecycleAns && MetalWaste == MetalWasteAns)
             {
-                if (leftoverRecycleAns > 0 || leftoverWasteAns > 0)
+                if (LeftoverRecycleAns > 0 || LeftoverWasteAns > 0)
                 {
                     Debug.LogFormat("[Waste Management #{0}] Metal correct!", _moduleId);
-                    stage++;
-                    input = 0;
-                    screen.text = "Leftovers";
-                    screen.fontSize = 50;
+                    Stage++;
+                    Input = 0;
+                    Screen.text = "Leftovers";
+                    Screen.fontSize = 50;
                 } else
                 {
                     Debug.LogFormat("[Waste Management #{0}] Metal correct!", _moduleId);
@@ -612,55 +615,56 @@ public class WasteManagementRed : MonoBehaviour {
                     Debug.LogFormat("[Waste Management #{0}] Module Passed.", _moduleId);
                     _isSolved = true; //module is solved
                     Module.HandlePass();
-                    Audio.PlaySoundAtTransform("wastemana", submit.transform);
-                    input = 0;
-                    screen.text = "";
-                    screen.fontSize = 75;
+                    Audio.PlaySoundAtTransform("wastemana", Submit.transform);
+                    Input = 0;
+                    Screen.text = "";
+                    Screen.fontSize = 75;
                 }
             }
             else
             {
                 Debug.LogFormat("[Waste Management #{0}] Metal incorrect, Strike.", _moduleId);
-                strike = true;
+                Strike = true;
                 Module.HandleStrike();
                 Init();
             }
         } else
         {
-            Debug.LogFormat("[Waste Management #{0}] Received {1} for leftover recycling, expected {2}", _moduleId, leftoverRecycle, leftoverRecycleAns);
-            Debug.LogFormat("[Waste Management #{0}] Received {1} for leftover waste, expected {2}", _moduleId, leftoverWaste, leftoverWasteAns);
-            if (leftoverRecycle == leftoverRecycleAns && leftoverWaste == leftoverWasteAns)
+            Debug.LogFormat("[Waste Management #{0}] Received {1} for leftover recycling, expected {2}", _moduleId, LeftoverRecycle, LeftoverRecycleAns);
+            Debug.LogFormat("[Waste Management #{0}] Received {1} for leftover waste, expected {2}", _moduleId, LeftoverWaste, LeftoverWasteAns);
+            if (LeftoverRecycle == LeftoverRecycleAns && LeftoverWaste == LeftoverWasteAns)
             {
                 Debug.LogFormat("[Waste Management #{0}] Leftovers correct!", _moduleId);
                 Debug.LogFormat("[Waste Management #{0}] Module Passed.", _moduleId);
                 _isSolved = true; //module is solved
                 Module.HandlePass();
-                Audio.PlaySoundAtTransform("wastemana", submit.transform);
-                input = 0;
-                screen.text = "";
-                screen.fontSize = 75;
+                Audio.PlaySoundAtTransform("wastemana", Submit.transform);
+                Input = 0;
+                Screen.text = "";
+                Screen.fontSize = 75;
             }
             else
             {
                 Debug.LogFormat("[Waste Management #{0}] Leftovers incorrect, Strike.", _moduleId);
-                strike = true;
+                Strike = true;
                 Module.HandleStrike();
                 Init();
             }
         }
-        if (stage >= 1 && stage < 4)
+        if (Stage >= 1 && Stage < 4)
         {
             int random = UnityEngine.Random.Range(1, 21); //5% chance of bar going blank
             if (random == 1)
             {
-                barempty = true;
-                barControl.gameObject.transform.localScale = new Vector3(1, 1, 0);
+                Barempty = true;
+                BarControl.gameObject.transform.localScale = new Vector3(1, 1, 0);
                 Debug.LogFormat("[Waste Management #{0}] Bar empty, submit expected or strike", _moduleId);
             }
         }
     }
     #endregion
-    #region TwitchPlays
+
+    #region Twitch Plays
     //twitch plays commands
 #pragma warning disable 414
     private string TwitchHelpMessage = "Allocate the number 66 to waste with !{0} LXVIW. Change the W to an R for recycling. Reset the module with !{0} Reset. Submit the answer with !{0} Submit.";
@@ -671,11 +675,11 @@ public class WasteManagementRed : MonoBehaviour {
         command = command.ToLowerInvariant().Trim();
         if (command.Equals("reset", StringComparison.InvariantCultureIgnoreCase))
         {
-            return new KMSelectable[] { reset };
+            return new KMSelectable[] { Reset };
         }
         else if (command.Equals("submit", StringComparison.InvariantCultureIgnoreCase))
         {
-            return new KMSelectable[] { submit };
+            return new KMSelectable[] { Submit };
         }
         else if (Regex.IsMatch(command, @"^[lxvi]+[wr]?$"))
         {
@@ -684,19 +688,19 @@ public class WasteManagementRed : MonoBehaviour {
             {
                 if (c == 'i')
                 {
-                    totalselect = totalselect.Concat(new KMSelectable[] { btnI }).ToArray();
+                    totalselect = totalselect.Concat(new KMSelectable[] { BtnI }).ToArray();
                 }
                 else if (c == 'v')
                 {
-                    totalselect = totalselect.Concat(new KMSelectable[] { btnV }).ToArray();
+                    totalselect = totalselect.Concat(new KMSelectable[] { BtnV }).ToArray();
                 }
                 else if (c == 'x')
                 {
-                    totalselect = totalselect.Concat(new KMSelectable[] { btnX }).ToArray();
+                    totalselect = totalselect.Concat(new KMSelectable[] { BtnX }).ToArray();
                 }
                 else if (c == 'l')
                 {
-                    totalselect = totalselect.Concat(new KMSelectable[] { btnL }).ToArray();
+                    totalselect = totalselect.Concat(new KMSelectable[] { BtnL }).ToArray();
                 }
                 else if (c == 'w')
                 {

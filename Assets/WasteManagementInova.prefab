@@ -2254,21 +2254,17 @@ MonoBehaviour:
   Info: {fileID: 114074949620550658}
   Audio: {fileID: 114581177072155226}
   Module: {fileID: 114057873391796222}
-  btnI: {fileID: 114875938533191210}
-  btnV: {fileID: 114696485948339502}
-  btnX: {fileID: 114479338446904418}
-  btnL: {fileID: 114609387833047886}
+  BtnI: {fileID: 114875938533191210}
+  BtnV: {fileID: 114696485948339502}
+  BtnX: {fileID: 114479338446904418}
+  BtnL: {fileID: 114609387833047886}
   Waste: {fileID: 114374584147466318}
   Recycle: {fileID: 114722079534562420}
-  submit: {fileID: 114066524425639740}
-  reset: {fileID: 114918556554619398}
-  screen: {fileID: 102562068227219710}
-  barControl: {fileID: 1447188004812384}
-  bar: {fileID: 23005444829409306}
-  TwitchHelpMessage: Allocate the number 66 to waste with !{0} LXVIW. Change the W
-    to an R for recycling. Reset the module with !{0} Reset. Submit the answer with
-    !{0} Submit.
-  TwitchManualCode: 
+  Submit: {fileID: 114066524425639740}
+  Reset: {fileID: 114918556554619398}
+  Screen: {fileID: 102562068227219710}
+  BarControl: {fileID: 1447188004812384}
+  Bar: {fileID: 23005444829409306}
 --- !u!114 &114213036079537656
 MonoBehaviour:
   m_ObjectHideFlags: 1
