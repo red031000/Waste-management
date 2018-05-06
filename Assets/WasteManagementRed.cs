@@ -247,7 +247,7 @@ public class WasteManagementRed : MonoBehaviour {
             Debug.LogFormat("[Waste Management #{0}] Metal amount is now {1}", _moduleId, MetalAmount);
         }
         //again, time stuff needs to be done a point of submission
-        if (Info.IsIndicatorOn(Indicator.BOB) && Info.GetPortCount() >= 6)
+        if (Info.IsIndicatorOn(Indicator.BOB) && Info.GetPortCount() >= 6 && ModulesName.Contains("Forget Me Not"))
         {
             MetalAmount += 99;
             Debug.LogFormat("[Waste Management #{0}] Added 99 to the metal amount (lit BOB and at least 6 ports)", _moduleId);
