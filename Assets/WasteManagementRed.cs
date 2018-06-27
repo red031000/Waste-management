@@ -267,7 +267,7 @@ public class WasteManagementRed : MonoBehaviour {
 
     private void TimeAdjustments()
     {
-        if (ModulesName.Contains("Morse Code") || ModulesName.Contains("Morse-A-Maze") || ModulesName.Contains("Morsematics") || ModulesName.Contains("Color Morse") || ModulesName.Contains("Morse War"))
+        if (ModulesName.Contains("Morse Code") || ModulesName.Contains("Morse-A-Maze") || ModulesName.Contains("Morsematics") || ModulesName.Contains("Color Morse") || ModulesName.Contains("Morse War") || ModulesName.Contains("Simon Sends"))
         {
             if (CurrentTime <= StartTime / 2)
             {
