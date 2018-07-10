@@ -4,6 +4,7 @@ using WasteManagement;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System;
+using System.Collections;
 
 public class WasteManagementRed : MonoBehaviour {
     #region Global Variables
@@ -60,7 +61,7 @@ public class WasteManagementRed : MonoBehaviour {
 
     private bool Morsemodules = false, Trnstrikes = false, Frkstrikes = false, Sigtime = false, Strike = false;
 
-    private bool _isSolved = false, _lightsOn = false, Generated = false, Calculated = false, Barempty = false;
+    private bool _isSolved = false, _lightsOn = false, Generated = false, Calculated = false, Barempty = false, ForcedSolve = false;
 
 	#endregion
 
@@ -550,7 +551,7 @@ public class WasteManagementRed : MonoBehaviour {
 
         if (!_lightsOn || _isSolved) return;
 
-        if (!Calculated)
+        if (!Calculated && !ForcedSolve)
         {
             //once submit button is pressed for the first time, those rules will be in effect for the rest of the bomb, unless you get a strike on this module
             CurrentTime = Mathf.FloorToInt(Info.GetTime());
@@ -559,7 +560,7 @@ public class WasteManagementRed : MonoBehaviour {
         }
         if (Stage == 1)
         {
-            CalculateProportions();
+            if (!ForcedSolve) CalculateProportions();
             Debug.LogFormat("[Waste Management #{0}] Received {1} for paper recycling, expected {2}", _moduleId, PaperRecycle, PaperRecycleAns);
             Debug.LogFormat("[Waste Management #{0}] Received {1} for paper waste, expected {2}", _moduleId, PaperWaste, PaperWasteAns);
             if (PaperRecycle == PaperRecycleAns && PaperWaste == PaperWasteAns)
@@ -725,5 +726,301 @@ public class WasteManagementRed : MonoBehaviour {
         else
             return null;
     }
+	private IEnumerator TwitchHandleForcedSolve()
+	{
+		if (!_isSolved)
+		{
+			yield return null;
+			ForcedSolve = true;
+			TimeAdjustments();
+			CalculateProportions();
+			Debug.LogFormat("[Waste Management #{0}] Forced solve.", _moduleId);
+			while (!_isSolved)
+			{
+				if (Barempty == true) SubmitHandler();
+				if (Stage == 1)
+				{
+					int PaperTempAns = PaperWasteAns;
+					int PaperLPress = PaperTempAns / 50;
+					PaperTempAns %= 50;
+					int PaperXPress = PaperTempAns / 10;
+					PaperTempAns %= 10;
+					int PaperVPress = PaperTempAns / 5;
+					PaperTempAns %= 5;
+					int PaperIPress = PaperTempAns;
+
+					for (int i = 0; i < PaperLPress; i++)
+					{
+						BtnLHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+					for (int i = 0; i < PaperXPress; i++)
+					{
+						BtnXHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+					for (int i = 0; i < PaperVPress; i++)
+					{
+						BtnVHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+					for (int i = 0; i < PaperIPress; i++)
+					{
+						BtnIHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+
+					WasteHandler();
+					yield return new WaitForSeconds(0.1f);
+
+					PaperTempAns = PaperRecycleAns;
+					PaperLPress = PaperTempAns / 50;
+					PaperTempAns %= 50;
+					PaperXPress = PaperTempAns / 10;
+					PaperTempAns %= 10;
+					PaperVPress = PaperTempAns / 5;
+					PaperTempAns %= 5;
+					PaperIPress = PaperTempAns;
+
+					for (int i = 0; i < PaperLPress; i++)
+					{
+						BtnLHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+					for (int i = 0; i < PaperXPress; i++)
+					{
+						BtnXHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+					for (int i = 0; i < PaperVPress; i++)
+					{
+						BtnVHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+					for (int i = 0; i < PaperIPress; i++)
+					{
+						BtnIHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+
+					RecycleHandler();
+					yield return new WaitForSeconds(0.1f);
+
+					SubmitHandler();
+					yield return new WaitForSeconds(0.1f);
+				} else if (Stage == 2)
+				{
+					int PlasticTempAns = PlasticWasteAns;
+					int PlasticLPress = PlasticTempAns / 50;
+					PlasticTempAns %= 50;
+					int PlasticXPress = PlasticTempAns / 10;
+					PlasticTempAns %= 10;
+					int PlasticVPress = PlasticTempAns / 5;
+					PlasticTempAns %= 5;
+					int PlasticIPress = PlasticTempAns;
+
+					for (int i = 0; i < PlasticLPress; i++)
+					{
+						BtnLHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+					for (int i = 0; i < PlasticXPress; i++)
+					{
+						BtnXHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+					for (int i = 0; i < PlasticVPress; i++)
+					{
+						BtnVHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+					for (int i = 0; i < PlasticIPress; i++)
+					{
+						BtnIHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+
+					WasteHandler();
+					yield return new WaitForSeconds(0.1f);
+
+					PlasticTempAns = PlasticRecycleAns;
+					PlasticLPress = PlasticTempAns / 50;
+					PlasticTempAns %= 50;
+					PlasticXPress = PlasticTempAns / 10;
+					PlasticTempAns %= 10;
+					PlasticVPress = PlasticTempAns / 5;
+					PlasticTempAns %= 5;
+					PlasticIPress = PlasticTempAns;
+
+					for (int i = 0; i < PlasticLPress; i++)
+					{
+						BtnLHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+					for (int i = 0; i < PlasticXPress; i++)
+					{
+						BtnXHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+					for (int i = 0; i < PlasticVPress; i++)
+					{
+						BtnVHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+					for (int i = 0; i < PlasticIPress; i++)
+					{
+						BtnIHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+
+					RecycleHandler();
+					yield return new WaitForSeconds(0.1f);
+
+					SubmitHandler();
+					yield return new WaitForSeconds(0.1f);
+				} else if (Stage == 3)
+				{
+					int MetalTempAns = MetalWasteAns;
+					int MetalLPress = MetalTempAns / 50;
+					MetalTempAns %= 50;
+					int MetalXPress = MetalTempAns / 10;
+					MetalTempAns %= 10;
+					int MetalVPress = MetalTempAns / 5;
+					MetalTempAns %= 5;
+					int MetalIPress = MetalTempAns;
+
+					for (int i = 0; i < MetalLPress; i++)
+					{
+						BtnLHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+					for (int i = 0; i < MetalXPress; i++)
+					{
+						BtnXHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+					for (int i = 0; i < MetalVPress; i++)
+					{
+						BtnVHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+					for (int i = 0; i < MetalIPress; i++)
+					{
+						BtnIHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+
+					WasteHandler();
+					yield return new WaitForSeconds(0.1f);
+
+					MetalTempAns = MetalRecycleAns;
+					MetalLPress = MetalTempAns / 50;
+					MetalTempAns %= 50;
+					MetalXPress = MetalTempAns / 10;
+					MetalTempAns %= 10;
+					MetalVPress = MetalTempAns / 5;
+					MetalTempAns %= 5;
+					MetalIPress = MetalTempAns;
+
+					for (int i = 0; i < MetalLPress; i++)
+					{
+						BtnLHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+					for (int i = 0; i < MetalXPress; i++)
+					{
+						BtnXHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+					for (int i = 0; i < MetalVPress; i++)
+					{
+						BtnVHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+					for (int i = 0; i < MetalIPress; i++)
+					{
+						BtnIHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+
+					RecycleHandler();
+					yield return new WaitForSeconds(0.1f);
+
+					SubmitHandler();
+					yield return new WaitForSeconds(0.1f);
+				} else if (Stage == 4)
+				{
+					int LeftoverTempAns = LeftoverWasteAns;
+					int LeftoverLPress = LeftoverTempAns / 50;
+					LeftoverTempAns %= 50;
+					int LeftoverXPress = LeftoverTempAns / 10;
+					LeftoverTempAns %= 10;
+					int LeftoverVPress = LeftoverTempAns / 5;
+					LeftoverTempAns %= 5;
+					int LeftoverIPress = LeftoverTempAns;
+
+					for (int i = 0; i < LeftoverLPress; i++)
+					{
+						BtnLHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+					for (int i = 0; i < LeftoverXPress; i++)
+					{
+						BtnXHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+					for (int i = 0; i < LeftoverVPress; i++)
+					{
+						BtnVHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+					for (int i = 0; i < LeftoverIPress; i++)
+					{
+						BtnIHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+
+					WasteHandler();
+					yield return new WaitForSeconds(0.1f);
+
+					LeftoverTempAns = LeftoverRecycleAns;
+					LeftoverLPress = LeftoverTempAns / 50;
+					LeftoverTempAns %= 50;
+					LeftoverXPress = LeftoverTempAns / 10;
+					LeftoverTempAns %= 10;
+					LeftoverVPress = LeftoverTempAns / 5;
+					LeftoverTempAns %= 5;
+					LeftoverIPress = LeftoverTempAns;
+
+					for (int i = 0; i < LeftoverLPress; i++)
+					{
+						BtnLHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+					for (int i = 0; i < LeftoverXPress; i++)
+					{
+						BtnXHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+					for (int i = 0; i < LeftoverVPress; i++)
+					{
+						BtnVHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+					for (int i = 0; i < LeftoverIPress; i++)
+					{
+						BtnIHandler();
+						yield return new WaitForSeconds(0.1f);
+					}
+
+					RecycleHandler();
+					yield return new WaitForSeconds(0.1f);
+
+					SubmitHandler();
+					yield return new WaitForSeconds(0.1f);
+				}
+			}
+		}
+	}
     #endregion
 }
