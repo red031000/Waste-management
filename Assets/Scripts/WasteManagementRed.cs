@@ -734,7 +734,7 @@ public class WasteManagementRed : MonoBehaviour {
 			ForcedSolve = true;
 			TimeAdjustments();
 			CalculateProportions();
-			Debug.LogFormat("[Waste Management #{0}] Forced solve.", _moduleId);
+			Debug.LogFormat("[Waste Management #{0}] Module forcibly solved", _moduleId);
 			while (!_isSolved)
 			{
 				if (Barempty == true) SubmitHandler();
