@@ -195,7 +195,7 @@ public class WasteManagementRed : MonoBehaviour {
             Debug.LogFormat("[Waste Management #{0}] Paper amount is now {1}", _moduleId, PaperAmount);
         }
         //don't calculate time dependent rules yet, as we don't know when the submit button is going to be pressed
-        if (Info.GetBatteryCount() == 0 && Info.GetIndicators().Count() < 3) //again, oops
+        if (Info.GetBatteryCount() == 0 && Info.GetIndicators().Count() < 3)
         {
             PaperAmount += 154;
             Debug.LogFormat("[Waste Management #{0}] Added 154 to the paper amount (zero batteries)", _moduleId);
