@@ -61,6 +61,8 @@ public class WasteManagementRed : MonoBehaviour {
 
     private bool Morsemodules = false, Trnstrikes = false, Frkstrikes = false, Sigtime = false, Strike = false;
 
+	private static readonly string[] MorseModulesList = new[] { "Morse Code", "Morse-A-Maze", "Morsematics", "Color Morse", "Morse War", "Simon Sends", "Reverse Morse" };
+
     private bool _isSolved = false, _lightsOn = false, Generated = false, Calculated = false, Barempty = false, ForcedSolve = false;
 
 	#endregion
@@ -268,7 +270,7 @@ public class WasteManagementRed : MonoBehaviour {
 
     private void TimeAdjustments()
     {
-        if (ModulesName.Contains("Morse Code") || ModulesName.Contains("Morse-A-Maze") || ModulesName.Contains("Morsematics") || ModulesName.Contains("Color Morse") || ModulesName.Contains("Morse War") || ModulesName.Contains("Simon Sends"))
+        if (ModulesName.Intersect(MorseModulesList).Any())
         {
             if (CurrentTime <= StartTime / 2)
             {
@@ -456,26 +458,50 @@ public class WasteManagementRed : MonoBehaviour {
         else Input += 50;
     }
 
-    private void RecycleHandler()
-    {
-        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, Recycle.transform);
-        Recycle.AddInteractionPunch();
-        if (!_lightsOn || _isSolved) return;
-        if (Barempty)
-        {
-            Module.HandleStrike();
-            Strike = true;
-            Debug.LogFormat("[Waste Management #{0}] Strike given, reset the module", _moduleId);
-            Init();
-        }
-        if (Stage == 1)
-            PaperRecycle = Input;
-        else if (Stage == 2)
-            PlasticRecycle = Input;
-        else if (Stage == 3)
-            MetalRecycle = Input;
-        else
-            LeftoverRecycle = Input;
+	private void RecycleHandler()
+	{
+		Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, Recycle.transform);
+		Recycle.AddInteractionPunch();
+		if (!_lightsOn || _isSolved) return;
+		if (Barempty)
+		{
+			Module.HandleStrike();
+			Strike = true;
+			Debug.LogFormat("[Waste Management #{0}] Strike given, reset the module", _moduleId);
+			Init();
+		}
+		if (Stage == 1)
+		{
+			PaperRecycle = Input;
+			Audio.PlaySoundAtTransform("PaperAdd", Recycle.transform);
+		}
+		else if (Stage == 2)
+		{
+			PlasticRecycle = Input;
+			Audio.PlaySoundAtTransform("PlasticAdd", Recycle.transform);
+		}
+		else if (Stage == 3)
+		{
+			MetalRecycle = Input;
+			Audio.PlaySoundAtTransform("MetalAdd", Recycle.transform);
+		}
+		else
+		{
+			LeftoverRecycle = Input;
+			int random = UnityEngine.Random.Range(0, 3);
+			switch (random)
+			{
+				case 0:
+					Audio.PlaySoundAtTransform("PaperAdd", Recycle.transform);
+					break;
+				case 1:
+					Audio.PlaySoundAtTransform("PlasticAdd", Recycle.transform);
+					break;
+				case 2:
+					Audio.PlaySoundAtTransform("MetalAdd", Recycle.transform);
+					break;
+			}
+		}
         Input = 0;
     }
 
@@ -491,14 +517,38 @@ public class WasteManagementRed : MonoBehaviour {
             Debug.LogFormat("[Waste Management #{0}] Strike given, reset the module", _moduleId);
             Init();
         }
-        if (Stage == 1)
-            PaperWaste = Input;
-        else if (Stage == 2)
-            PlasticWaste = Input;
-        else if (Stage == 3)
-            MetalWaste = Input;
-        else
-            LeftoverWaste = Input;
+		if (Stage == 1)
+		{
+			PaperWaste = Input;
+			Audio.PlaySoundAtTransform("PaperAdd", Waste.transform);
+		}
+		else if (Stage == 2)
+		{
+			PlasticWaste = Input;
+			Audio.PlaySoundAtTransform("PlasticAdd", Waste.transform);
+		}
+		else if (Stage == 3)
+		{
+			MetalWaste = Input;
+			Audio.PlaySoundAtTransform("MetalAdd", Waste.transform);
+		}
+		else
+		{
+			LeftoverWaste = Input;
+			int random = UnityEngine.Random.Range(0, 3);
+			switch (random)
+			{
+				case 0:
+					Audio.PlaySoundAtTransform("PaperAdd", Waste.transform);
+					break;
+				case 1:
+					Audio.PlaySoundAtTransform("PlasticAdd", Waste.transform);
+					break;
+				case 2:
+					Audio.PlaySoundAtTransform("MetalAdd", Waste.transform);
+					break;
+			}
+		}
         Input = 0;
     }
 
@@ -566,6 +616,7 @@ public class WasteManagementRed : MonoBehaviour {
             if (PaperRecycle == PaperRecycleAns && PaperWaste == PaperWasteAns)
             {
                 Debug.LogFormat("[Waste Management #{0}] Paper correct!", _moduleId);
+				Audio.PlaySoundAtTransform("PaperSubmit", Submit.transform);
                 Stage++;
                 Input = 0;
                 Screen.text = "Plastic";
@@ -584,6 +635,7 @@ public class WasteManagementRed : MonoBehaviour {
             if (PlasticRecycle == PlasticRecycleAns && PlasticWaste == PlasticWasteAns)
             {
                 Debug.LogFormat("[Waste Management #{0}] Plastic correct!", _moduleId);
+				Audio.PlaySoundAtTransform("PlasticSubmit", Submit.transform);
                 Stage++;
                 Input = 0;
                 Screen.text = "Metal";
@@ -605,6 +657,7 @@ public class WasteManagementRed : MonoBehaviour {
                 if (LeftoverRecycleAns > 0 || LeftoverWasteAns > 0)
                 {
                     Debug.LogFormat("[Waste Management #{0}] Metal correct!", _moduleId);
+					Audio.PlaySoundAtTransform("MetalSubmit", Submit.transform);
                     Stage++;
                     Input = 0;
                     Screen.text = "Leftovers";
@@ -616,7 +669,7 @@ public class WasteManagementRed : MonoBehaviour {
                     Debug.LogFormat("[Waste Management #{0}] Module Passed.", _moduleId);
                     _isSolved = true; //module is solved
                     Module.HandlePass();
-                    Audio.PlaySoundAtTransform("wastemana", Submit.transform);
+					Audio.PlaySoundAtTransform("WasteManagementSolve", Submit.transform);
                     Input = 0;
                     Screen.text = "";
                     Screen.fontSize = 75;
@@ -639,7 +692,7 @@ public class WasteManagementRed : MonoBehaviour {
                 Debug.LogFormat("[Waste Management #{0}] Module Passed.", _moduleId);
                 _isSolved = true; //module is solved
                 Module.HandlePass();
-                Audio.PlaySoundAtTransform("wastemana", Submit.transform);
+				Audio.PlaySoundAtTransform("WasteManagementSolve", Submit.transform);
                 Input = 0;
                 Screen.text = "";
                 Screen.fontSize = 75;
@@ -668,8 +721,8 @@ public class WasteManagementRed : MonoBehaviour {
     #region Twitch Plays
     //twitch plays commands
 #pragma warning disable 414
-    private string TwitchHelpMessage = "Allocate the number 66 to waste with !{0} LXVIW. Change the W to an R for recycling. Reset the module with !{0} Reset. Submit the answer with !{0} Submit.";
-    private string TwitchManualCode = "Waste Management";
+    private readonly string TwitchHelpMessage = "Allocate the number 66 to waste with !{0} LXVIW. Change the W to an R for recycling. Reset the module with !{0} Reset. Submit the answer with !{0} Submit.";
+    private readonly string TwitchManualCode = "Waste Management";
 #pragma warning restore 414
     public KMSelectable[] ProcessTwitchCommand(string command)
     {
