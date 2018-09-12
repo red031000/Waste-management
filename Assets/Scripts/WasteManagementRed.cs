@@ -319,6 +319,7 @@ public class WasteManagementRed : MonoBehaviour {
     {
         bool Continueto4 = false;
         bool Is4true = false;
+	int var1;
         if (PaperRemaining + PlasticRemaining + MetalRemaining > 695)
         {
             PaperRecycleAns = PaperRemaining;
@@ -336,8 +337,13 @@ public class WasteManagementRed : MonoBehaviour {
         }
         else if (MetalRemaining > 200)
         {
-            MetalRecycleAns = (int)(MetalRemaining * 0.75f);
-            MetalWasteAns = (int)(MetalRemaining * 0.25f);
+	    var1 = (MetalRemaining * 30) / 4;
+            MetalRecycleAns = var1 / 10;
+	    if((var1 % 10) >= 5)
+	    {
+		MetalRecycleAns += 1;    
+	    }
+            MetalWasteAns = MetalRemaining - MetalRecycleAns;
             MetalRemaining = 0;
             Debug.LogFormat("[Waste Management #{0}] Metal answer is recycle three quarters, waste one quarter", _moduleId);
             Continueto4 = true;
@@ -346,10 +352,20 @@ public class WasteManagementRed : MonoBehaviour {
         {
             PaperRecycleAns = PaperRemaining;
             PaperRemaining = 0;
-            MetalWasteAns = (int)(MetalRemaining * 0.25f);
-            MetalRemaining = (int)(MetalRemaining * 0.75f);
+	    var1 = (MetalRemaining * 10) / 4;
+	    MetalWasteAns = var1 / 10
+	    if((var1 % 10) >= 5)
+	    {
+		MetalWasteAns += 1;    
+	    }
+            MetalRemaining = MetalRemaining - MetalWasteAns;
             LeftoverRemaining = MetalRemaining + PlasticRemaining;
-            LeftoverRecycleAns = (int)(LeftoverRemaining * 0.5f);
+	    var1 = (LeftoverRecycleAns * 10) / 2
+            LeftoverRecycleAns = var1 / 10
+            if((var1 % 10) >= 5)
+	    {
+		LeftoverRecycleAns += 1;    
+	    }
             Debug.LogFormat("[Waste Management #{0}] Paper answer is recycle everything", _moduleId);
             Debug.LogFormat("[Waste Management #{0}] Plastic answer is all to leftovers", _moduleId);
             Debug.LogFormat("[Waste Management #{0}] Metal answer is waste one quarter, the rest to leftovers", _moduleId);
@@ -360,8 +376,13 @@ public class WasteManagementRed : MonoBehaviour {
         {
             if (PlasticRemaining < 300 && PlasticRemaining > 100)
             {
-                PlasticRecycleAns = (int)(PlasticRemaining * 0.5f);
-                PlasticRemaining = (int)(PlasticRemaining * 0.5f);
+		var1 = (PlasticRemaining * 10) / 2;
+                PlasticRecycleAns = var1 / 10;
+		if((var1 % 10) >= 5)
+	        {
+			PlasticRecycleAns += 1;    
+	        }
+                PlasticRemaining = PlasticRemaining - PlasticRecycleAns;
                 Is4true = true;
                 Debug.LogFormat("[Waste Management #{0}] Plastic answer is recycle half", _moduleId);
             } else if (PlasticRemaining < 100 && PlasticRemaining > 10)
@@ -379,8 +400,13 @@ public class WasteManagementRed : MonoBehaviour {
                     Debug.LogFormat("[Waste Management #{0}] Paper answer is recycle all", _moduleId);
                 } else
                 {
-                    PaperWasteAns = (int)(PaperRemaining / 3.0f);
-                    PaperRemaining = (int)(2 * PaperRemaining / 3.0f);
+	            var1 = (PaperRemaining * 10) / 3;
+                    PaperWasteAns = var1 / 10;
+		    if((var1 % 10) >= 5)
+	    	    {
+			PaperWasteAns += 1;    
+	            }
+                    PaperRemaining = PaperRemaining - PaperWasteAns;
                     Debug.LogFormat("[Waste Management #{0}] Paper answer is waste one third", _moduleId);
                 }
             }
