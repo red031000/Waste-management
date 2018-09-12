@@ -336,8 +336,8 @@ public class WasteManagementRed : MonoBehaviour {
 		}
 		else if (MetalRemaining > 200)
 		{
-			MetalRecycleAns = Mathf.RoundToInt(MetalRemaining * 0.75f);
-			MetalWasteAns = Mathf.RoundToInt(MetalRemaining * 0.25f);
+			MetalRecycleAns = (int)Math.Round(MetalRemaining * 0.75m, MidpointRounding.AwayFromZero);
+			MetalWasteAns = (int)Math.Round(MetalRemaining * 0.25m, MidpointRounding.AwayFromZero);
 			MetalRemaining = 0;
 			Debug.LogFormat("[Waste Management #{0}] Metal answer is recycle three quarters, waste one quarter", _moduleId);
 			Continueto4 = true;
@@ -346,10 +346,10 @@ public class WasteManagementRed : MonoBehaviour {
 		{
 			PaperRecycleAns = PaperRemaining;
 			PaperRemaining = 0;
-			MetalWasteAns = Mathf.RoundToInt(MetalRemaining * 0.25f);
-			MetalRemaining = Mathf.RoundToInt(MetalRemaining * 0.75f);
+			MetalWasteAns = (int)Math.Round(MetalRemaining * 0.25m, MidpointRounding.AwayFromZero);
+			MetalRemaining = (int)Math.Round(MetalRemaining * 0.75m, MidpointRounding.AwayFromZero);
 			LeftoverRemaining = MetalRemaining + PlasticRemaining;
-			LeftoverRecycleAns = Mathf.RoundToInt(LeftoverRemaining * 0.5f);
+			LeftoverRecycleAns = (int)Math.Round(LeftoverRemaining * 0.5m, MidpointRounding.AwayFromZero);
 			Debug.LogFormat("[Waste Management #{0}] Paper answer is recycle everything", _moduleId);
 			Debug.LogFormat("[Waste Management #{0}] Plastic answer is all to leftovers", _moduleId);
 			Debug.LogFormat("[Waste Management #{0}] Metal answer is waste one quarter, the rest to leftovers", _moduleId);
@@ -360,8 +360,8 @@ public class WasteManagementRed : MonoBehaviour {
 		{
 			if (PlasticRemaining < 300 && PlasticRemaining > 100)
 			{
-				PlasticRecycleAns = Mathf.RoundToInt(PlasticRemaining * 0.5f);
-				PlasticRemaining = Mathf.RoundToInt(PlasticRemaining * 0.5f);
+				PlasticRecycleAns = (int)Math.Round(PlasticRemaining * 0.5m, MidpointRounding.AwayFromZero);
+				PlasticRemaining = (int)Math.Round(PlasticRemaining * 0.5m, MidpointRounding.AwayFromZero);
 				Is4true = true;
 				Debug.LogFormat("[Waste Management #{0}] Plastic answer is recycle half", _moduleId);
 			} else if (PlasticRemaining < 100 && PlasticRemaining > 10)
@@ -379,8 +379,8 @@ public class WasteManagementRed : MonoBehaviour {
 					Debug.LogFormat("[Waste Management #{0}] Paper answer is recycle all", _moduleId);
 				} else
 				{
-					PaperWasteAns = Mathf.RoundToInt(PaperRemaining / 3.0f);
-					PaperRemaining = Mathf.RoundToInt(2 * PaperRemaining / 3.0f);
+					PaperWasteAns = (int)Math.Round(PaperRemaining / 3.0m, MidpointRounding.AwayFromZero);
+					PaperRemaining = (int)Math.Round(2 * PaperRemaining / 3.0m, MidpointRounding.AwayFromZero);
 					Debug.LogFormat("[Waste Management #{0}] Paper answer is waste one third", _moduleId);
 				}
 			}
