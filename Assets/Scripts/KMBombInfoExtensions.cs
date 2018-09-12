@@ -1,9 +1,9 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 
-namespace WasteManagement
+namespace KModkit
 {
     public enum Battery
     {
@@ -44,7 +44,8 @@ namespace WasteManagement
         MSA,
         TRN,
         BOB,
-        FRK
+        FRK,
+        NLL
     }
 
     public enum IndicatorColor
