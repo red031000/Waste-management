@@ -15,7 +15,6 @@ public class WasteManagementRed : MonoBehaviour {
 	public KMSelectable BtnI, BtnV, BtnX, BtnL, Waste, Recycle, Submit, Reset;
 	public TextMesh Screen;
 	public GameObject BarControl;
-	public MeshRenderer Bar;
 
 	private static int _moduleIdCounter = 1;
 	private int _moduleId = 0;
@@ -68,7 +67,7 @@ public class WasteManagementRed : MonoBehaviour {
 	#endregion
 
 	#region Answer Calculation
-	void Start () {
+	private void Start () {
 		_moduleId = _moduleIdCounter++;
 		Module.OnActivate += Activate;
 	}
@@ -117,13 +116,13 @@ public class WasteManagementRed : MonoBehaviour {
 		};
 	}
 
-	void Activate()
+	private void Activate()
 	{
 		Init();
 		_lightsOn = true;
 	}
 		
-	void Init()
+	private void Init()
 	{
 		if (!Generated)
 		{
@@ -152,7 +151,7 @@ public class WasteManagementRed : MonoBehaviour {
 		Strike = false;
 	}
 
-	void UndoTime()
+	private void UndoTime()
 	{
 		if (Morsemodules)
 		{
@@ -176,10 +175,10 @@ public class WasteManagementRed : MonoBehaviour {
 		}
 	}
 
-	void GenerateAmounts()
+	private void GenerateAmounts()
 	{
 		//paper
-		if (Info.IsIndicatorPresent(Indicator.IND) && KMBombInfoExtensions.GetBatteryCount(Info) < 5)
+		if (Info.IsIndicatorPresent(Indicator.IND) && Info.GetBatteryCount() < 5)
 		{
 			PaperAmount += 19;
 			Debug.LogFormat("[Waste Management #{0}] Added 19 to the paper amount (IND indicator)", _moduleId);
@@ -243,7 +242,7 @@ public class WasteManagementRed : MonoBehaviour {
 			Debug.LogFormat("[Waste Management #{0}] Subtracted 200 from the metal amount (CAR indicator)", _moduleId);
 			Debug.LogFormat("[Waste Management #{0}] Metal amount is now {1}", _moduleId, MetalAmount);
 		}
-		if (KMBombInfoExtensions.IsDuplicatePortPresent(Info) && !(Info.IsPortPresent(Port.DVI)))
+		if (Info.IsDuplicatePortPresent() && !(Info.IsPortPresent(Port.DVI)))
 		{
 			MetalAmount += 153;
 			Debug.LogFormat("[Waste Management #{0}] Added 153 to the metal amount (duplicate port)", _moduleId);
@@ -317,8 +316,8 @@ public class WasteManagementRed : MonoBehaviour {
 
 	private void CalculateProportions()
 	{
-		bool Continueto4 = false;
-		bool Is4true = false;
+		bool continueto4 = false;
+		bool is4True = false;
 		if (PaperRemaining + PlasticRemaining + MetalRemaining > 695)
 		{
 			PaperRecycleAns = PaperRemaining;
@@ -340,14 +339,14 @@ public class WasteManagementRed : MonoBehaviour {
 			MetalWasteAns = (int)Math.Round(MetalRemaining * 0.25m, MidpointRounding.AwayFromZero);
 			MetalRemaining = 0;
 			Debug.LogFormat("[Waste Management #{0}] Metal answer is recycle three quarters, waste one quarter", _moduleId);
-			Continueto4 = true;
+			continueto4 = true;
 		}
 		else if (MetalRemaining < PaperRemaining)
 		{
 			PaperRecycleAns = PaperRemaining;
 			PaperRemaining = 0;
 			MetalWasteAns = (int)Math.Round(MetalRemaining * 0.25m, MidpointRounding.AwayFromZero);
-			MetalRemaining = (int)Math.Round(MetalRemaining * 0.75m, MidpointRounding.AwayFromZero);
+			MetalRemaining -= MetalWasteAns;
 			LeftoverRemaining = MetalRemaining + PlasticRemaining;
 			LeftoverRecycleAns = (int)Math.Round(LeftoverRemaining * 0.5m, MidpointRounding.AwayFromZero);
 			Debug.LogFormat("[Waste Management #{0}] Paper answer is recycle everything", _moduleId);
@@ -355,45 +354,44 @@ public class WasteManagementRed : MonoBehaviour {
 			Debug.LogFormat("[Waste Management #{0}] Metal answer is waste one quarter, the rest to leftovers", _moduleId);
 			Debug.LogFormat("[Waste Management #{0}] Leftovers answer is recycle half", _moduleId);
 		}
-		else Continueto4 = true;
-		if (Continueto4)
+		else continueto4 = true;
+
+		if (!continueto4) return;
+		if (PlasticRemaining < 300 && PlasticRemaining > 100)
 		{
-			if (PlasticRemaining < 300 && PlasticRemaining > 100)
+			PlasticRecycleAns = (int)Math.Round(PlasticRemaining * 0.5m, MidpointRounding.AwayFromZero);
+			PlasticRemaining -= PlasticRecycleAns;
+			is4True = true;
+			Debug.LogFormat("[Waste Management #{0}] Plastic answer is recycle half", _moduleId);
+		} else if (PlasticRemaining < 100 && PlasticRemaining > 10)
+		{
+			PlasticWasteAns = PlasticRemaining;
+			PlasticRemaining = 0;
+			Debug.LogFormat("[Waste Management #{0}] Plastic answer is waste all", _moduleId);
+		}
+		if (PaperRemaining < 65)
+		{
+			if (is4True)
 			{
-				PlasticRecycleAns = (int)Math.Round(PlasticRemaining * 0.5m, MidpointRounding.AwayFromZero);
-				PlasticRemaining = (int)Math.Round(PlasticRemaining * 0.5m, MidpointRounding.AwayFromZero);
-				Is4true = true;
-				Debug.LogFormat("[Waste Management #{0}] Plastic answer is recycle half", _moduleId);
-			} else if (PlasticRemaining < 100 && PlasticRemaining > 10)
-			{
-				PlasticWasteAns = PlasticRemaining;
-				PlasticRemaining = 0;
-				Debug.LogFormat("[Waste Management #{0}] Plastic answer is waste all", _moduleId);
-			}
-			if (PaperRemaining < 65)
-			{
-				if (Is4true)
-				{
-					PaperRecycleAns = PaperRemaining;
-					PaperRemaining = 0;
-					Debug.LogFormat("[Waste Management #{0}] Paper answer is recycle all", _moduleId);
-				} else
-				{
-					PaperWasteAns = (int)Math.Round(PaperRemaining / 3.0m, MidpointRounding.AwayFromZero);
-					PaperRemaining = (int)Math.Round(2 * PaperRemaining / 3.0m, MidpointRounding.AwayFromZero);
-					Debug.LogFormat("[Waste Management #{0}] Paper answer is waste one third", _moduleId);
-				}
-			}
-			LeftoverRemaining = PaperRemaining + PlasticRemaining + MetalRemaining;
-			if (LeftoverRemaining < 300 && LeftoverRemaining > 100)
-			{
-				LeftoverRecycleAns = LeftoverRemaining;
-				Debug.LogFormat("[Waste Management #{0}] Leftover answer is recycle all", _moduleId);
+				PaperRecycleAns = PaperRemaining;
+				PaperRemaining = 0;
+				Debug.LogFormat("[Waste Management #{0}] Paper answer is recycle all", _moduleId);
 			} else
 			{
-				LeftoverWasteAns = LeftoverRemaining;
-				Debug.LogFormat("[Waste Management #{0}] Leftover answer is waste all", _moduleId);
+				PaperWasteAns = (int)Math.Round(PaperRemaining / 3.0m, MidpointRounding.AwayFromZero);
+				PaperRemaining -= PaperWasteAns;
+				Debug.LogFormat("[Waste Management #{0}] Paper answer is waste one third", _moduleId);
 			}
+		}
+		LeftoverRemaining = PaperRemaining + PlasticRemaining + MetalRemaining;
+		if (LeftoverRemaining < 300 && LeftoverRemaining > 100)
+		{
+			LeftoverRecycleAns = LeftoverRemaining;
+			Debug.LogFormat("[Waste Management #{0}] Leftover answer is recycle all", _moduleId);
+		} else
+		{
+			LeftoverWasteAns = LeftoverRemaining;
+			Debug.LogFormat("[Waste Management #{0}] Leftover answer is waste all", _moduleId);
 		}
 	}
 	#endregion
@@ -470,36 +468,39 @@ public class WasteManagementRed : MonoBehaviour {
 			Debug.LogFormat("[Waste Management #{0}] Strike given, reset the module", _moduleId);
 			Init();
 		}
-		if (Stage == 1)
+		switch (Stage)
 		{
-			PaperRecycle = Input;
-			Audio.PlaySoundAtTransform("PaperAdd", Recycle.transform);
-		}
-		else if (Stage == 2)
-		{
-			PlasticRecycle = Input;
-			Audio.PlaySoundAtTransform("PlasticAdd", Recycle.transform);
-		}
-		else if (Stage == 3)
-		{
-			MetalRecycle = Input;
-			Audio.PlaySoundAtTransform("MetalAdd", Recycle.transform);
-		}
-		else
-		{
-			LeftoverRecycle = Input;
-			int random = UnityEngine.Random.Range(0, 3);
-			switch (random)
+			case 1:
+				PaperRecycle = Input;
+				Audio.PlaySoundAtTransform("PaperAdd", Recycle.transform);
+				break;
+			case 2:
+				PlasticRecycle = Input;
+				Audio.PlaySoundAtTransform("PlasticAdd", Recycle.transform);
+				break;
+			case 3:
+				MetalRecycle = Input;
+				Audio.PlaySoundAtTransform("MetalAdd", Recycle.transform);
+				break;
+			default:
 			{
-				case 0:
-					Audio.PlaySoundAtTransform("PaperAdd", Recycle.transform);
-					break;
-				case 1:
-					Audio.PlaySoundAtTransform("PlasticAdd", Recycle.transform);
-					break;
-				case 2:
-					Audio.PlaySoundAtTransform("MetalAdd", Recycle.transform);
-					break;
+				LeftoverRecycle = Input;
+				int random = UnityEngine.Random.Range(0, 3);
+				// ReSharper disable once SwitchStatementMissingSomeCases
+				switch (random)
+				{
+					case 0:
+						Audio.PlaySoundAtTransform("PaperAdd", Recycle.transform);
+						break;
+					case 1:
+						Audio.PlaySoundAtTransform("PlasticAdd", Recycle.transform);
+						break;
+					case 2:
+						Audio.PlaySoundAtTransform("MetalAdd", Recycle.transform);
+						break;
+				}
+
+				break;
 			}
 		}
 		Input = 0;
@@ -517,36 +518,38 @@ public class WasteManagementRed : MonoBehaviour {
 			Debug.LogFormat("[Waste Management #{0}] Strike given, reset the module", _moduleId);
 			Init();
 		}
-		if (Stage == 1)
+		switch (Stage)
 		{
-			PaperWaste = Input;
-			Audio.PlaySoundAtTransform("PaperAdd", Waste.transform);
-		}
-		else if (Stage == 2)
-		{
-			PlasticWaste = Input;
-			Audio.PlaySoundAtTransform("PlasticAdd", Waste.transform);
-		}
-		else if (Stage == 3)
-		{
-			MetalWaste = Input;
-			Audio.PlaySoundAtTransform("MetalAdd", Waste.transform);
-		}
-		else
-		{
-			LeftoverWaste = Input;
-			int random = UnityEngine.Random.Range(0, 3);
-			switch (random)
+			case 1:
+				PaperWaste = Input;
+				Audio.PlaySoundAtTransform("PaperAdd", Waste.transform);
+				break;
+			case 2:
+				PlasticWaste = Input;
+				Audio.PlaySoundAtTransform("PlasticAdd", Waste.transform);
+				break;
+			case 3:
+				MetalWaste = Input;
+				Audio.PlaySoundAtTransform("MetalAdd", Waste.transform);
+				break;
+			default:
 			{
-				case 0:
-					Audio.PlaySoundAtTransform("PaperAdd", Waste.transform);
-					break;
-				case 1:
-					Audio.PlaySoundAtTransform("PlasticAdd", Waste.transform);
-					break;
-				case 2:
-					Audio.PlaySoundAtTransform("MetalAdd", Waste.transform);
-					break;
+				LeftoverWaste = Input;
+				int random = UnityEngine.Random.Range(0, 3);
+				switch (random)
+				{
+					case 0:
+						Audio.PlaySoundAtTransform("PaperAdd", Waste.transform);
+						break;
+					case 1:
+						Audio.PlaySoundAtTransform("PlasticAdd", Waste.transform);
+						break;
+					case 2:
+						Audio.PlaySoundAtTransform("MetalAdd", Waste.transform);
+						break;
+				}
+
+				break;
 			}
 		}
 		Input = 0;
@@ -564,26 +567,28 @@ public class WasteManagementRed : MonoBehaviour {
 			Debug.LogFormat("[Waste Management #{0}] Strike given, reset the module", _moduleId);
 			Init();
 		}
-		if (Stage == 1)
+		switch (Stage)
 		{
-			Input = 0;
-			PaperWaste = 0;
-			PaperRecycle = 0;
-		} else if (Stage == 2)
-		{
-			Input = 0;
-			PlasticWaste = 0;
-			PlasticRecycle = 0;
-		} else if (Stage == 3)
-		{
-			Input = 0;
-			MetalWaste = 0;
-			MetalRecycle = 0;
-		} else
-		{
-			Input = 0;
-			LeftoverWaste = 0;
-			LeftoverRecycle = 0;
+			case 1:
+				Input = 0;
+				PaperWaste = 0;
+				PaperRecycle = 0;
+				break;
+			case 2:
+				Input = 0;
+				PlasticWaste = 0;
+				PlasticRecycle = 0;
+				break;
+			case 3:
+				Input = 0;
+				MetalWaste = 0;
+				MetalRecycle = 0;
+				break;
+			default:
+				Input = 0;
+				LeftoverWaste = 0;
+				LeftoverRecycle = 0;
+				break;
 		}
 	}
 
@@ -608,190 +613,199 @@ public class WasteManagementRed : MonoBehaviour {
 			Debug.LogFormat("[Waste Management #{0}] Submit button pressed, performing final adjustments", _moduleId);
 			TimeAdjustments();
 		}
-		if (Stage == 1)
+		switch (Stage)
 		{
-			if (!ForcedSolve) CalculateProportions();
-			Debug.LogFormat("[Waste Management #{0}] Received {1} for paper recycling, expected {2}", _moduleId, PaperRecycle, PaperRecycleAns);
-			Debug.LogFormat("[Waste Management #{0}] Received {1} for paper waste, expected {2}", _moduleId, PaperWaste, PaperWasteAns);
-			if (PaperRecycle == PaperRecycleAns && PaperWaste == PaperWasteAns)
+			case 1:
 			{
-				Debug.LogFormat("[Waste Management #{0}] Paper correct!", _moduleId);
-				Audio.PlaySoundAtTransform("PaperSubmit", Submit.transform);
-				Stage++;
-				Input = 0;
-				Screen.text = "Plastic";
-				Screen.fontSize = 70;
-			} else
-			{
-				Debug.LogFormat("[Waste Management #{0}] Paper incorrect, Strike.", _moduleId);
-				Module.HandleStrike();
-				Strike = true;
-				Init();
-			}
-		} else if (Stage == 2)
-		{
-			Debug.LogFormat("[Waste Management #{0}] Received {1} for plastic recycling, expected {2}", _moduleId, PlasticRecycle, PlasticRecycleAns);
-			Debug.LogFormat("[Waste Management #{0}] Received {1} for plastic waste, expected {2}", _moduleId, PlasticWaste, PlasticWasteAns);
-			if (PlasticRecycle == PlasticRecycleAns && PlasticWaste == PlasticWasteAns)
-			{
-				Debug.LogFormat("[Waste Management #{0}] Plastic correct!", _moduleId);
-				Audio.PlaySoundAtTransform("PlasticSubmit", Submit.transform);
-				Stage++;
-				Input = 0;
-				Screen.text = "Metal";
-				Screen.fontSize = 75;
-			}
-			else
-			{
-				Debug.LogFormat("[Waste Management #{0}] Plastic incorrect, Strike.", _moduleId);
-				Module.HandleStrike();
-				Strike = true;
-				Init();
-			}
-		} else if (Stage == 3)
-		{
-			Debug.LogFormat("[Waste Management #{0}] Received {1} for metal recycling, expected {2}", _moduleId, MetalRecycle, MetalRecycleAns);
-			Debug.LogFormat("[Waste Management #{0}] Received {1} for metal waste, expected {2}", _moduleId, MetalWaste, MetalWasteAns);
-			if (MetalRecycle == MetalRecycleAns && MetalWaste == MetalWasteAns)
-			{
-				if (LeftoverRecycleAns > 0 || LeftoverWasteAns > 0)
+				if (!ForcedSolve) CalculateProportions();
+				Debug.LogFormat("[Waste Management #{0}] Received {1} for paper recycling, expected {2}", _moduleId, PaperRecycle, PaperRecycleAns);
+				Debug.LogFormat("[Waste Management #{0}] Received {1} for paper waste, expected {2}", _moduleId, PaperWaste, PaperWasteAns);
+				if (PaperRecycle == PaperRecycleAns && PaperWaste == PaperWasteAns)
 				{
-					Debug.LogFormat("[Waste Management #{0}] Metal correct!", _moduleId);
-					Audio.PlaySoundAtTransform("MetalSubmit", Submit.transform);
+					Debug.LogFormat("[Waste Management #{0}] Paper correct!", _moduleId);
+					Audio.PlaySoundAtTransform("PaperSubmit", Submit.transform);
 					Stage++;
 					Input = 0;
-					Screen.text = "Leftovers";
-					Screen.fontSize = 50;
+					Screen.text = "Plastic";
+					Screen.fontSize = 70;
 				} else
 				{
-					Debug.LogFormat("[Waste Management #{0}] Metal correct!", _moduleId);
-					Debug.LogFormat("[Waste Management #{0}] There are no leftovers", _moduleId);
+					Debug.LogFormat("[Waste Management #{0}] Paper incorrect, Strike.", _moduleId);
+					Module.HandleStrike();
+					Strike = true;
+					Init();
+				}
+
+				break;
+			}
+			case 2:
+			{
+				Debug.LogFormat("[Waste Management #{0}] Received {1} for plastic recycling, expected {2}", _moduleId, PlasticRecycle, PlasticRecycleAns);
+				Debug.LogFormat("[Waste Management #{0}] Received {1} for plastic waste, expected {2}", _moduleId, PlasticWaste, PlasticWasteAns);
+				if (PlasticRecycle == PlasticRecycleAns && PlasticWaste == PlasticWasteAns)
+				{
+					Debug.LogFormat("[Waste Management #{0}] Plastic correct!", _moduleId);
+					Audio.PlaySoundAtTransform("PlasticSubmit", Submit.transform);
+					Stage++;
+					Input = 0;
+					Screen.text = "Metal";
+					Screen.fontSize = 75;
+				}
+				else
+				{
+					Debug.LogFormat("[Waste Management #{0}] Plastic incorrect, Strike.", _moduleId);
+					Module.HandleStrike();
+					Strike = true;
+					Init();
+				}
+
+				break;
+			}
+			case 3:
+			{
+				Debug.LogFormat("[Waste Management #{0}] Received {1} for metal recycling, expected {2}", _moduleId, MetalRecycle, MetalRecycleAns);
+				Debug.LogFormat("[Waste Management #{0}] Received {1} for metal waste, expected {2}", _moduleId, MetalWaste, MetalWasteAns);
+				if (MetalRecycle == MetalRecycleAns && MetalWaste == MetalWasteAns)
+				{
+					if (LeftoverRecycleAns > 0 || LeftoverWasteAns > 0)
+					{
+						Debug.LogFormat("[Waste Management #{0}] Metal correct!", _moduleId);
+						Audio.PlaySoundAtTransform("MetalSubmit", Submit.transform);
+						Stage++;
+						Input = 0;
+						Screen.text = "Leftovers";
+						Screen.fontSize = 50;
+					} else
+					{
+						Debug.LogFormat("[Waste Management #{0}] Metal correct!", _moduleId);
+						Debug.LogFormat("[Waste Management #{0}] There are no leftovers", _moduleId);
+						Debug.LogFormat("[Waste Management #{0}] Module Passed.", _moduleId);
+						_isSolved = true; //module is solved
+						Module.HandlePass();
+						Audio.PlaySoundAtTransform("WasteManagementSolve", Submit.transform);
+						Input = 0;
+						Screen.text = "";
+						Screen.fontSize = 75;
+					}
+				}
+				else
+				{
+					Debug.LogFormat("[Waste Management #{0}] Metal incorrect, Strike.", _moduleId);
+					Strike = true;
+					Module.HandleStrike();
+					Init();
+				}
+
+				break;
+			}
+			default:
+			{
+				Debug.LogFormat("[Waste Management #{0}] Received {1} for leftover recycling, expected {2}", _moduleId, LeftoverRecycle, LeftoverRecycleAns);
+				Debug.LogFormat("[Waste Management #{0}] Received {1} for leftover waste, expected {2}", _moduleId, LeftoverWaste, LeftoverWasteAns);
+				if (LeftoverRecycle == LeftoverRecycleAns && LeftoverWaste == LeftoverWasteAns)
+				{
+					Debug.LogFormat("[Waste Management #{0}] Leftovers correct!", _moduleId);
 					Debug.LogFormat("[Waste Management #{0}] Module Passed.", _moduleId);
 					_isSolved = true; //module is solved
 					Module.HandlePass();
 					Audio.PlaySoundAtTransform("WasteManagementSolve", Submit.transform);
 					Input = 0;
-					Screen.text = "";
+					Screen.text = string.Empty;
 					Screen.fontSize = 75;
 				}
-			}
-			else
-			{
-				Debug.LogFormat("[Waste Management #{0}] Metal incorrect, Strike.", _moduleId);
-				Strike = true;
-				Module.HandleStrike();
-				Init();
-			}
-		} else
-		{
-			Debug.LogFormat("[Waste Management #{0}] Received {1} for leftover recycling, expected {2}", _moduleId, LeftoverRecycle, LeftoverRecycleAns);
-			Debug.LogFormat("[Waste Management #{0}] Received {1} for leftover waste, expected {2}", _moduleId, LeftoverWaste, LeftoverWasteAns);
-			if (LeftoverRecycle == LeftoverRecycleAns && LeftoverWaste == LeftoverWasteAns)
-			{
-				Debug.LogFormat("[Waste Management #{0}] Leftovers correct!", _moduleId);
-				Debug.LogFormat("[Waste Management #{0}] Module Passed.", _moduleId);
-				_isSolved = true; //module is solved
-				Module.HandlePass();
-				Audio.PlaySoundAtTransform("WasteManagementSolve", Submit.transform);
-				Input = 0;
-				Screen.text = "";
-				Screen.fontSize = 75;
-			}
-			else
-			{
-				Debug.LogFormat("[Waste Management #{0}] Leftovers incorrect, Strike.", _moduleId);
-				Strike = true;
-				Module.HandleStrike();
-				Init();
+				else
+				{
+					Debug.LogFormat("[Waste Management #{0}] Leftovers incorrect, Strike.", _moduleId);
+					Strike = true;
+					Module.HandleStrike();
+					Init();
+				}
+
+				break;
 			}
 		}
-		if (Stage >= 1 && Stage < 4)
-		{
-			int random = UnityEngine.Random.Range(1, 21); //5% chance of bar going blank
-			if (random == 1)
-			{
-				Barempty = true;
-				BarControl.gameObject.transform.localScale = new Vector3(1, 1, 0);
-				Debug.LogFormat("[Waste Management #{0}] Bar empty, submit expected or strike", _moduleId);
-			}
-		}
+
+		if (Stage < 1 || Stage >= 4) return;
+		int random = UnityEngine.Random.Range(1, 21); //5% chance of bar going blank
+		if (random != 1) return;
+		Barempty = true;
+		BarControl.gameObject.transform.localScale = new Vector3(1, 1, 0);
+		Debug.LogFormat("[Waste Management #{0}] Bar empty, submit expected or strike", _moduleId);
 	}
 	#endregion
 
 	#region Twitch Plays
 	//twitch plays commands
 #pragma warning disable 414
+	// ReSharper disable InconsistentNaming
 	private readonly string TwitchHelpMessage = "Allocate the number 66 to waste with !{0} LXVIW. Change the W to an R for recycling. Reset the module with !{0} Reset. Submit the answer with !{0} Submit.";
 	private readonly string TwitchManualCode = "Waste Management";
+	// ReSharper restore InconsistentNaming
 #pragma warning restore 414
 	public KMSelectable[] ProcessTwitchCommand(string command)
 	{
 		command = command.ToLowerInvariant().Trim();
 		if (command.Equals("reset", StringComparison.InvariantCultureIgnoreCase))
 		{
-			return new KMSelectable[] { Reset };
+			return new[] { Reset };
 		}
-		else if (command.Equals("submit", StringComparison.InvariantCultureIgnoreCase))
+
+		if (command.Equals("submit", StringComparison.InvariantCultureIgnoreCase))
 		{
-			return new KMSelectable[] { Submit };
+			return new[] { Submit };
 		}
-		else if (Regex.IsMatch(command, @"^[lxvi]+[wr]?$"))
+		if (Regex.IsMatch(command, @"^[lxvi]+[wr]?$"))
 		{
 			KMSelectable[] totalselect = { };
 			foreach (char c in command)
 			{
-				if (c == 'i')
+				// ReSharper disable once SwitchStatementMissingSomeCases
+				switch (c)
 				{
-					totalselect = totalselect.Concat(new KMSelectable[] { BtnI }).ToArray();
-				}
-				else if (c == 'v')
-				{
-					totalselect = totalselect.Concat(new KMSelectable[] { BtnV }).ToArray();
-				}
-				else if (c == 'x')
-				{
-					totalselect = totalselect.Concat(new KMSelectable[] { BtnX }).ToArray();
-				}
-				else if (c == 'l')
-				{
-					totalselect = totalselect.Concat(new KMSelectable[] { BtnL }).ToArray();
-				}
-				else if (c == 'w')
-				{
-					totalselect = totalselect.Concat(new KMSelectable[] { Waste }).ToArray();
-				}
-				else if (c == 'r')
-				{
-					totalselect = totalselect.Concat(new KMSelectable[] { Recycle }).ToArray();
+					case 'i':
+						totalselect = totalselect.Concat(new[] { BtnI }).ToArray();
+						break;
+					case 'v':
+						totalselect = totalselect.Concat(new[] { BtnV }).ToArray();
+						break;
+					case 'x':
+						totalselect = totalselect.Concat(new[] { BtnX }).ToArray();
+						break;
+					case 'l':
+						totalselect = totalselect.Concat(new[] { BtnL }).ToArray();
+						break;
+					case 'w':
+						totalselect = totalselect.Concat(new[] { Waste }).ToArray();
+						break;
+					case 'r':
+						totalselect = totalselect.Concat(new[] { Recycle }).ToArray();
+						break;
 				}
 			}
 			return totalselect;
-		} else if (Regex.IsMatch(command, @"^[wr]$"))
-		{
-			if (command == "w")
-			{
-				return new KMSelectable[] { Waste };
-			} else
-			{
-				return new KMSelectable[] { Recycle };
-			}
 		}
-		else
-			return null;
+		if (Regex.IsMatch(command, @"^[wr]$"))
+		{
+			return command == "w" ? new[] { Waste } : new[] { Recycle };
+		}
+
+		return null;
 	}
 	private IEnumerator TwitchHandleForcedSolve()
 	{
-		if (!_isSolved)
+		if (_isSolved) yield break;
+		yield return null;
+		ForcedSolve = true;
+		TimeAdjustments();
+		CalculateProportions();
+		Debug.LogFormat("[Waste Management #{0}] Module forcibly solved", _moduleId);
+		while (!_isSolved)
 		{
-			yield return null;
-			ForcedSolve = true;
-			TimeAdjustments();
-			CalculateProportions();
-			Debug.LogFormat("[Waste Management #{0}] Module forcibly solved", _moduleId);
-			while (!_isSolved)
+			if (Barempty) SubmitHandler();
+			// ReSharper disable once SwitchStatementMissingSomeCases
+			switch (Stage)
 			{
-				if (Barempty == true) SubmitHandler();
-				if (Stage == 1)
+				case 1:
 				{
 					int PaperTempAns = PaperWasteAns;
 					int PaperLPress = PaperTempAns / 50;
@@ -861,7 +875,9 @@ public class WasteManagementRed : MonoBehaviour {
 
 					SubmitHandler();
 					yield return new WaitForSeconds(0.1f);
-				} else if (Stage == 2)
+					break;
+				}
+				case 2:
 				{
 					int PlasticTempAns = PlasticWasteAns;
 					int PlasticLPress = PlasticTempAns / 50;
@@ -931,7 +947,9 @@ public class WasteManagementRed : MonoBehaviour {
 
 					SubmitHandler();
 					yield return new WaitForSeconds(0.1f);
-				} else if (Stage == 3)
+					break;
+				}
+				case 3:
 				{
 					int MetalTempAns = MetalWasteAns;
 					int MetalLPress = MetalTempAns / 50;
@@ -1001,7 +1019,9 @@ public class WasteManagementRed : MonoBehaviour {
 
 					SubmitHandler();
 					yield return new WaitForSeconds(0.1f);
-				} else if (Stage == 4)
+					break;
+				}
+				case 4:
 				{
 					int LeftoverTempAns = LeftoverWasteAns;
 					int LeftoverLPress = LeftoverTempAns / 50;
@@ -1071,6 +1091,7 @@ public class WasteManagementRed : MonoBehaviour {
 
 					SubmitHandler();
 					yield return new WaitForSeconds(0.1f);
+					break;
 				}
 			}
 		}
