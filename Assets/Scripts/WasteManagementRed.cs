@@ -217,7 +217,7 @@ public class WasteManagementRed : MonoBehaviour {
 			Debug.LogFormat("[Waste Management #{0}] Subtracted 17 from the plastic amount (Empty port plate)", _moduleId);
 			Debug.LogFormat("[Waste Management #{0}] Plastic amount is now {1}", _moduleId, PlasticAmount);
 		}
-		if (Info.IsIndicatorPresent(Indicator.FRQ) && !(Info.GetBatteryCount(Battery.D) > Info.GetBatteryCount(Battery.AA)))
+		if (Info.IsIndicatorPresent(Indicator.FRQ) && !(Info.GetBatteryCount(Battery.D) > Info.GetBatteryCount(Battery.AA) + Info.GetBatteryCount(Battery.AAx3) + Info.GetBatteryCount(Battery.AAx4)))
 		{
 			PlasticAmount += 153;
 			Debug.LogFormat("[Waste Management #{0}] Added 153 to the plastic amount (FRQ indicator)", _moduleId);
