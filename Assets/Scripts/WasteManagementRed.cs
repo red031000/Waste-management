@@ -55,12 +55,12 @@ public class WasteManagementRed : MonoBehaviour {
 	private int LeftoverWaste = 0;
 	private int LeftoverWasteAns = 0;
 
-	private int ConsonantOccurances = 0;
+	private int ConsonantOccurrences = 0;
 	private int Stage = 1;
 
 	private bool Morsemodules = false, Trnstrikes = false, Frkstrikes = false, Sigtime = false, Strike = false;
 
-	private static readonly string[] MorseModulesList = new[] { "Morse Code", "Morse-A-Maze", "Morsematics", "Color Morse", "Morse War", "Simon Sends", "Reverse Morse" };
+	private static readonly string[] MorseModulesList = { "Morse Code", "Morse-A-Maze", "Morsematics", "Color Morse", "Morse War", "Simon Sends", "Reverse Morse" };
 
 	private bool _isSolved = false, _lightsOn = false, Generated = false, Calculated = false, Barempty = false, ForcedSolve = false;
 
@@ -128,7 +128,7 @@ public class WasteManagementRed : MonoBehaviour {
 		{
 			StartTime = Mathf.FloorToInt(Info.GetTime());
 			ModulesName = Info.GetModuleNames();
-			ConsonantOccurances = Info.GetSerialNumber().Count("BCDFGHJKLMNPQRSTVWXYZ".Contains);
+			ConsonantOccurrences = Info.GetSerialNumber().Count("BCDFGHJKLMNPQRSTVWXYZ".Contains);
 			GenerateAmounts(); //generate the initial amounts of paper, plastic and metal
 			Screen.text = "Paper";
 		}
@@ -148,6 +148,15 @@ public class WasteManagementRed : MonoBehaviour {
 		MetalWaste = 0;
 		LeftoverWaste = 0;
 		Input = 0;
+
+		PlasticRecycleAns = 0;
+		PaperRecycleAns = 0;
+		MetalRecycleAns = 0;
+		MetalWasteAns = 0;
+		PlasticWasteAns = 0;
+		PaperWasteAns = 0;
+		LeftoverWasteAns = 0;
+		LeftoverRecycleAns = 0;
 		Strike = false;
 	}
 
@@ -168,11 +177,10 @@ public class WasteManagementRed : MonoBehaviour {
 			PlasticAmount -= 69;
 			Frkstrikes = false;
 		}
-		if (Sigtime)
-		{
-			MetalAmount -= 99;
-			Sigtime = false;
-		}
+
+		if (!Sigtime) return;
+		MetalAmount -= 99;
+		Sigtime = false;
 	}
 
 	private void GenerateAmounts()
@@ -203,7 +211,7 @@ public class WasteManagementRed : MonoBehaviour {
 			Debug.LogFormat("[Waste Management #{0}] Added 154 to the paper amount (zero batteries)", _moduleId);
 			Debug.LogFormat("[Waste Management #{0}] Paper amount is now {1}", _moduleId, PaperAmount);
 		}
-		if (Info.GetSerialNumberLetters().Any("SAVEMYWORLD".Contains) && !(ConsonantOccurances > 2))
+		if (Info.GetSerialNumberLetters().Any("SAVEMYWORLD".Contains) && !(ConsonantOccurrences > 2))
 		{
 			PaperAmount += 200;
 			Debug.LogFormat("[Waste Management #{0}] Added 200 to the paper amount (Save My World)", _moduleId);
@@ -796,6 +804,7 @@ public class WasteManagementRed : MonoBehaviour {
 		if (_isSolved) yield break;
 		yield return null;
 		ForcedSolve = true;
+		Init();
 		TimeAdjustments();
 		CalculateProportions();
 		Debug.LogFormat("[Waste Management #{0}] Module forcibly solved", _moduleId);
