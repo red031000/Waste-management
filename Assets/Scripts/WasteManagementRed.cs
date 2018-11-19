@@ -60,8 +60,6 @@ public class WasteManagementRed : MonoBehaviour {
 
 	private bool Morsemodules = false, Trnstrikes = false, Frkstrikes = false, Sigtime = false, Strike = false;
 
-	private static readonly string[] MorseModulesList = { "Morse Code", "Morse-A-Maze", "Morsematics", "Color Morse", "Morse War", "Simon Sends", "Reverse Morse" };
-
 	private bool _isSolved = false, _lightsOn = false, Generated = false, Calculated = false, Barempty = false, ForcedSolve = false;
 
 	#endregion
@@ -277,7 +275,7 @@ public class WasteManagementRed : MonoBehaviour {
 
 	private void TimeAdjustments()
 	{
-		if (ModulesName.Intersect(MorseModulesList).Any())
+		if (ModulesName.Any(x => x.ToLowerInvariant().Contains("morse") || x.Equals("Simon Sends") || x.Equals("Morsematics")))
 		{
 			if (CurrentTime <= StartTime / 2)
 			{
