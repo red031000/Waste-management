@@ -342,7 +342,7 @@ public class WasteManagementRed : MonoBehaviour {
 		else if (MetalRemaining > 200)
 		{
 			MetalRecycleAns = (int)Math.Round(MetalRemaining * 0.75m, MidpointRounding.AwayFromZero);
-			MetalWasteAns = (int)Math.Round(MetalRemaining * 0.25m, MidpointRounding.AwayFromZero);
+			MetalWasteAns = MetalRemaining - MetalRecycleAns;
 			MetalRemaining = 0;
 			Debug.LogFormat("[Waste Management #{0}] Metal answer is recycle three quarters, waste one quarter", _moduleId);
 			continueto4 = true;
